@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Our custom theme colors
+				'brand-blue': '#4e54e6',
+				'brand-light-blue': '#e6e9ff',
+				'brand-gray': '#f7f8fc',
+				'text-dark': '#333344',
+				'text-muted': '#777788',
+				'success': '#4ade80',
+				'warning': '#fbbf24',
+				'danger': '#f87171',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -89,6 +99,10 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			boxShadow: {
+				'soft': '0 4px 15px rgba(0, 0, 0, 0.05)',
+				'card': '0 2px 10px rgba(0, 0, 0, 0.03)',
 			}
 		}
 	},
