@@ -2,6 +2,7 @@
 import { Equipment } from "@/types";
 import { Button } from "@/components/ui/button";
 import placeholderImg from "/placeholder.svg";
+import { Box, Package, File, Clipboard } from "lucide-react";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -11,19 +12,26 @@ interface EquipmentCardProps {
 export default function EquipmentCard({ equipment, onReserve }: EquipmentCardProps) {
   const { id, name, description, available, image } = equipment;
 
+  // Function to get the appropriate icon based on the equipment name
+  const getIcon = () => {
+    const lcName = name.toLowerCase();
+    
+    if (lcName.includes("paper") || lcName.includes("note")) {
+      return <File className="w-full h-full text-gray-600" />;
+    } else if (lcName.includes("folder") || lcName.includes("binder")) {
+      return <Clipboard className="w-full h-full text-gray-600" />;
+    } else if (lcName.includes("pen") || lcName.includes("marker") || lcName.includes("pencil")) {
+      return <Clipboard className="w-full h-full text-gray-600" />;
+    } else {
+      return <Package className="w-full h-full text-gray-600" />;
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col">
       <div className="flex items-start justify-between mb-2">
         <div className="flex-shrink-0 w-10 h-10 mr-3">
-          <img 
-            src={image || placeholderImg} 
-            alt={name} 
-            className="w-full h-full object-contain"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = placeholderImg;
-            }}
-          />
+          {getIcon()}
         </div>
         
         {available > 0 ? (
