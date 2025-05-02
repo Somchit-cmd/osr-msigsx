@@ -27,7 +27,7 @@ export default function EquipmentCard({ equipment, onReserve }: EquipmentCardPro
       </div>
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-semibold text-lg">{name}</h3>
-        <Badge variant={available > 0 ? "success" : "destructive"} className="px-2 py-0.5">
+        <Badge variant={available > 0 ? "default" : "destructive"} className={`px-2 py-0.5 ${available > 0 ? "bg-green-500 hover:bg-green-600" : ""}`}>
           {available > 0 ? `${available} available` : "Out of stock"}
         </Badge>
       </div>
