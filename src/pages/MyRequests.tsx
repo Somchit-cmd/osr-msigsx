@@ -30,8 +30,8 @@ const MyRequests = () => {
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">My Requests</h1>
-        <p className="text-text-muted mb-8">Track and manage your equipment requests</p>
+        <h1 className="text-3xl font-bold mb-2">My Supply Requests</h1>
+        <p className="text-text-muted mb-8">Track and manage your office supply requests</p>
         
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-4 md:grid-cols-5 h-auto mb-6">

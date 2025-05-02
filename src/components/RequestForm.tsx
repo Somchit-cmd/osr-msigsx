@@ -78,7 +78,7 @@ export default function RequestForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Request Equipment</DialogTitle>
+          <DialogTitle>Request Office Supplies</DialogTitle>
           <DialogDescription>
             Fill out this form to request {equipment?.name}. You'll be notified when your request is processed.
           </DialogDescription>
@@ -107,7 +107,7 @@ export default function RequestForm({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="equipment">Equipment</Label>
+            <Label htmlFor="equipment">Office Supply</Label>
             <Input
               id="equipment"
               value={equipment?.name || ""}

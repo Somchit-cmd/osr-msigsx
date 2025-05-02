@@ -38,7 +38,7 @@ const AdminDashboard = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-text-muted mb-8">Overview of equipment requests and inventory</p>
+        <p className="text-text-muted mb-8">Overview of office supply requests and inventory</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard 
@@ -70,7 +70,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Recent Requests</CardTitle>
-              <CardDescription>Recent equipment requests requiring approval</CardDescription>
+              <CardDescription>Recent supply requests requiring approval</CardDescription>
             </CardHeader>
             <CardContent>
               <RequestTable 
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Low Stock Alert</CardTitle>
-              <CardDescription>Equipment items that need restocking</CardDescription>
+              <CardDescription>Office supplies that need restocking</CardDescription>
             </CardHeader>
             <CardContent>
               {lowStockItems.length === 0 ? (

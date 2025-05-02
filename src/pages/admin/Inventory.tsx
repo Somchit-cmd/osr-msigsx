@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { inventoryItems } from "@/data/mockData";
 import Header from "@/components/Header";
@@ -96,8 +95,8 @@ const AdminInventory = () => {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Manage Inventory</h1>
-            <p className="text-text-muted">Manage equipment items and stock levels</p>
+            <h1 className="text-3xl font-bold mb-2">Manage Office Supplies</h1>
+            <p className="text-text-muted">Manage supplies and stock levels</p>
           </div>
           
           <Button 

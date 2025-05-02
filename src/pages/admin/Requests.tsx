@@ -72,8 +72,8 @@ const AdminRequests = () => {
       <Header userRole="admin" />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Manage Requests</h1>
-        <p className="text-text-muted mb-8">Review and process equipment requests</p>
+        <h1 className="text-3xl font-bold mb-2">Manage Supply Requests</h1>
+        <p className="text-text-muted mb-8">Review and process office supply requests</p>
         
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-5 h-auto mb-6">
@@ -98,7 +98,7 @@ const AdminRequests = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by employee or equipment..."
+                placeholder="Search by employee or supply name..."
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

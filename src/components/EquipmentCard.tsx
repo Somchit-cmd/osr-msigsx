@@ -37,7 +37,7 @@ export default function EquipmentCard({ equipment, onReserve }: EquipmentCardPro
         className="w-full bg-brand-blue hover:bg-brand-blue/90"
         disabled={available <= 0}
       >
-        Reserve Now
+        Request Now
       </Button>
     </div>
   );
