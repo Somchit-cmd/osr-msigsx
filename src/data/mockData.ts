@@ -1,5 +1,6 @@
-
 import { Department, Employee, Equipment, EquipmentRequest, InventoryItem, RequestStatus } from "@/types";
+import { useState, useEffect } from "react";
+import { getInventory } from "@/lib/inventoryService";
 
 export const departments: Department[] = [
   { id: "dept-1", name: "Marketing" },
@@ -17,7 +18,7 @@ export const employees: Employee[] = [
   { id: "emp-5", name: "David Wilson", department: "dept-5", role: "employee" },
   { id: "emp-6", name: "Jessica Taylor", department: "dept-2", role: "admin" },
   { id: "emp-7", name: "Robert Martinez", department: "dept-1", role: "employee" },
-  { id: "emp-8", name: "Lisa Thomas", department: "dept-3", role: "supervisor" },
+  { id: "emp-8", name: "Lisa Thomas", department: "dept-3", role: "employee" },
 ];
 
 export const equipments: Equipment[] = [

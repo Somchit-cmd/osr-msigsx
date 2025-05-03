@@ -1,38 +1,56 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import users from "@/data/users.json";
+import logo from "@/assets/logo-png-only.webp";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate login process
+
     setTimeout(() => {
       setIsSubmitting(false);
-      
-      if (email.endsWith("@admin.com") && password === "admin123") {
+
+      const user = users.find(
+        (u) => u.username === username && u.password === password
+      );
+
+      if (user) {
         toast({
           title: "Login successful",
-          description: "Welcome to the admin dashboard",
+          description: `Welcome, ${user.name} ${user.surname}!`,
         });
-        navigate("/admin/dashboard");
+        // Store user info in localStorage
+        localStorage.setItem("user", JSON.stringify(user));
+        // Redirect based on role
+        if (user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
       } else {
         toast({
           title: "Login failed",
-          description: "Invalid email or password",
+          description: "Invalid username or password",
           variant: "destructive",
         });
       }
@@ -44,51 +62,41 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-6">
-            <svg 
-              viewBox="0 0 24 24" 
-              className="w-12 h-12 text-brand-blue" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
+            <img src={logo} alt="Company Logo" className="w-20 h-20 object-contain" />
           </div>
-          <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access the admin dashboard
+          <CardTitle className="text-xl font-bold text-center text-brand-blue mb-2">
+            Welcome to MSIGSX OSR
+          </CardTitle>
+          <CardDescription className="text-center text-gray-500 mb-4">
+            Please sign in with your staff credentials to continue.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="admin@admin.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="Your staff id number"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="text-sm text-brand-blue hover:underline"
-                >
-                  Forgot password?
-                </a>
               </div>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Repeat your staff id number"
                 required
               />
+              
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox id="remember" />
@@ -101,20 +109,16 @@ const Login = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button 
-              type="submit" 
-              className="w-full bg-brand-blue hover:bg-brand-blue/90" 
+            <Button
+              type="submit"
+              className="w-full bg-brand-blue hover:bg-brand-blue/90"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Logging in..." : "Log in"}
             </Button>
           </CardFooter>
         </form>
-        <div className="px-8 pb-8 text-center text-sm text-text-muted">
-          <a href="/" className="hover:text-brand-blue underline">
-            Return to home page
-          </a>
-        </div>
+        
       </Card>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Table,
@@ -31,13 +30,13 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[180px]">Equipment</TableHead>
-            {isAdmin && <TableHead>Employee</TableHead>}
-            {isAdmin && <TableHead>Department</TableHead>}
-            <TableHead className="text-center">Quantity</TableHead>
-            <TableHead className="text-center">Request Date</TableHead>
-            <TableHead className="text-center">Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="w-[180px] bg-gray-100 font-bold">Equipment</TableHead>
+            {isAdmin && <TableHead className="bg-gray-100 font-bold">Employee</TableHead>}
+            {isAdmin && <TableHead className="bg-gray-100 font-bold">Department</TableHead>}
+            <TableHead className="text-center bg-gray-100 font-bold">Quantity</TableHead>
+            <TableHead className="text-center bg-gray-100 font-bold">Request Date</TableHead>
+            <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
+            <TableHead className="text-right bg-gray-100 font-bold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

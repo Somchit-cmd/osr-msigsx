@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { equipments } from "@/data/mockData";
 import { Equipment } from "@/types";
 import Header from "@/components/Header";
@@ -10,6 +9,7 @@ import RequestForm from "@/components/RequestForm";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import categoriesData from "@/data/categories.json";
 
 const Index = () => {
   const { toast } = useToast();
@@ -17,10 +17,16 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState("All Items");
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
-  
-  // Get unique categories
-  const categories = [...new Set(equipments.map(item => item.category))];
-  
+  const [categories, setCategories] = useState(categoriesData);
+
+  // Read categories from localStorage on mount
+  useEffect(() => {
+    const localCategories = localStorage.getItem("categories");
+    if (localCategories) {
+      setCategories(JSON.parse(localCategories));
+    }
+  }, []);
+
   // Filter equipment by category and search query
   const filteredEquipment = equipments.filter(item => {
     const matchesCategory = activeCategory === "All Items" || item.category === activeCategory;

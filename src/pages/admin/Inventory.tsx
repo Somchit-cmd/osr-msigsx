@@ -142,12 +142,12 @@ const AdminInventory = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Item</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="text-center">Available</TableHead>
-                <TableHead className="text-center">Total Stock</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="bg-gray-100 font-bold">Item</TableHead>
+                <TableHead className="bg-gray-100 font-bold">Category</TableHead>
+                <TableHead className="text-center bg-gray-100 font-bold">Available</TableHead>
+                <TableHead className="text-center bg-gray-100 font-bold">Total Stock</TableHead>
+                <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
+                <TableHead className="text-right bg-gray-100 font-bold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

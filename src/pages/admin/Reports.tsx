@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { equipmentRequests } from "@/data/mockData";
 import Header from "@/components/Header";
@@ -217,12 +216,12 @@ const AdminReports = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Employee</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Equipment</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="bg-gray-100 font-bold">Date</TableHead>
+                    <TableHead className="bg-gray-100 font-bold">Employee</TableHead>
+                    <TableHead className="bg-gray-100 font-bold">Department</TableHead>
+                    <TableHead className="bg-gray-100 font-bold">Equipment</TableHead>
+                    <TableHead className="bg-gray-100 font-bold">Quantity</TableHead>
+                    <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

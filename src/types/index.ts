@@ -34,7 +34,7 @@ export type Employee = {
   id: string;
   name: string;
   department: string;
-  role: 'employee' | 'admin' | 'supervisor';
+  role: 'employee' | 'admin';
 };
 
 export type InventoryItem = Equipment & {
@@ -47,7 +47,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  role: 'employee' | 'admin' | 'supervisor';
+  role: 'employee' | 'admin';
   departmentId: string;
 };
 

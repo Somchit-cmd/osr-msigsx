@@ -1,0 +1,24 @@
+[
+  {
+    "username": "admin",
+    "password": "password",
+    "name": "admin",
+    "surname": "MSIGSX",
+    "department": "HR",
+    "title": "System Administrator",
+    "email": "admin@company.com",
+    "phone": "+1234567890",
+    "role": "admin"
+  },
+  {
+    "username": "4020",
+    "password": "4020",
+    "name": "Somchit",
+    "surname": "Khanthavong",
+    "department": "HR",
+    "title": "IT Specialist",
+    "email": "somchit.khanthavong@msig-sokxay.com",
+    "phone": "+8562078397567",
+    "role": "employee"
+  }
+]

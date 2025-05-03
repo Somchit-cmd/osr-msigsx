@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -16,7 +15,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { departments, employees } from "@/data/mockData";
 import { Equipment } from "@/types";
-import { currentUser } from "@/data/mockData";
 
 interface RequestFormProps {
   isOpen: boolean;
@@ -32,12 +30,27 @@ export default function RequestForm({
   onSubmit,
 }: RequestFormProps) {
   const { toast } = useToast();
+
+  // Set up form state
   const [formData, setFormData] = useState({
-    employeeName: currentUser.name,
-    department: departments.find(d => d.id === currentUser.departmentId)?.name || "",
+    employeeName: "",
+    department: "",
     quantity: 1,
     notes: "",
   });
+
+  // Update form data when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      setFormData({
+        employeeName: user ? `${user.name} ${user.surname}` : "",
+        department: user ? user.department : "",
+        quantity: 1,
+        notes: "",
+      });
+    }
+  }, [isOpen]);
 
   const handleChange = (field: string, value: string | number) => {
     setFormData(prev => ({
@@ -86,7 +99,7 @@ export default function RequestForm({
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="employeeName">Employee Name</Label>
+              <Label htmlFor="employeeName">Full Name</Label>
               <Input
                 id="employeeName"
                 value={formData.employeeName}
