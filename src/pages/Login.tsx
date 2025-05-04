@@ -15,46 +15,52 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import users from "@/data/users.json";
 import logo from "@/assets/logo-png-only.webp";
+import { authenticate } from "@/lib/authService";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [username, setUsername] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-
-      const user = users.find(
-        (u) => u.username === username && u.password === password
-      );
-
-      if (user) {
-        toast({
-          title: "Login successful",
-          description: `Welcome, ${user.name} ${user.surname}!`,
-        });
-        // Store user info in localStorage
+    setError("");
+    const user = await authenticate(employeeId, password);
+    if (user) {
+      // Clear previous sessions
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      // Store user session based on "Remember me"
+      if (rememberMe) {
         localStorage.setItem("user", JSON.stringify(user));
-        // Redirect based on role
-        if (user.role === "admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/");
-        }
       } else {
-        toast({
-          title: "Login failed",
-          description: "Invalid username or password",
-          variant: "destructive",
-        });
+        sessionStorage.setItem("user", JSON.stringify(user));
       }
-    }, 1000);
+      toast({
+        title: "Login successful",
+        description: `Welcome, ${user.name} ${user.surname}!`,
+      });
+      // Redirect based on role
+      if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
+    } else {
+      toast({
+        title: "Login failed",
+        description: "Invalid employee ID or password",
+        variant: "destructive",
+      });
+      setError("Invalid employee ID or password");
+    }
+    setIsSubmitting(false);
   };
 
   return (
@@ -71,16 +77,16 @@ const Login = () => {
             Please sign in with your staff credentials to continue.
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="employeeId">Employee ID</Label>
               <Input
-                id="username"
+                id="employeeId"
                 type="text"
                 placeholder="Your staff id number"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={employeeId}
+                onChange={(e) => setEmployeeId(e.target.value)}
                 required
               />
             </div>
@@ -88,18 +94,31 @@ const Login = () => {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Repeat your staff id number"
-                required
-              />
-              
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Repeat your staff id number"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  tabIndex={-1}
+                >
+                  {showPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="remember" />
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked === true)}
+              />
               <label
                 htmlFor="remember"
                 className="text-sm font-medium leading-none cursor-pointer"
@@ -118,7 +137,7 @@ const Login = () => {
             </Button>
           </CardFooter>
         </form>
-        
+        {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
       </Card>
     </div>
   );

@@ -7,7 +7,9 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const user =
+    JSON.parse(sessionStorage.getItem("user") || "null") ||
+    JSON.parse(localStorage.getItem("user") || "null");
 
   if (!user) {
     // Redirect to login if no user is logged in

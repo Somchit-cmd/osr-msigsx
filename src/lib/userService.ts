@@ -1,0 +1,117 @@
+import { db } from "./firebase";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser
+} from "firebase/auth";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  onSnapshot
+} from "firebase/firestore";
+
+// Types
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'employee';
+  department: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Initialize auth
+const auth = getAuth();
+
+// Sign in user
+export async function signIn(email: string, password: string) {
+  return await signInWithEmailAndPassword(auth, email, password);
+}
+
+// Sign out user
+export async function signOutUser() {
+  return await signOut(auth);
+}
+
+// Get current user
+export function getCurrentUser() {
+  return auth.currentUser;
+}
+
+// Subscribe to auth state changes
+export function onAuthStateChange(callback: (user: FirebaseUser | null) => void) {
+  return onAuthStateChanged(auth, callback);
+}
+
+// Get user profile
+export async function getUserProfile(userId: string): Promise<User | null> {
+  const userDoc = await getDoc(doc(db, "users", userId));
+  if (userDoc.exists()) {
+    return { id: userDoc.id, ...userDoc.data() } as User;
+  }
+  return null;
+}
+
+// Create user profile
+export async function createUserProfile(
+  userId: string,
+  userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>
+) {
+  const userProfile: User = {
+    id: userId,
+    ...userData,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  
+  return await setDoc(doc(db, "users", userId), userProfile);
+}
+
+// Update user profile
+export async function updateUserProfile(
+  userId: string,
+  userData: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>
+) {
+  return await updateDoc(doc(db, "users", userId), {
+    ...userData,
+    updatedAt: new Date()
+  });
+}
+
+// Subscribe to user profile changes
+export function subscribeToUserProfile(
+  userId: string,
+  callback: (user: User | null) => void
+) {
+  return onSnapshot(doc(db, "users", userId), (doc) => {
+    if (doc.exists()) {
+      callback({ id: doc.id, ...doc.data() } as User);
+    } else {
+      callback(null);
+    }
+  });
+}
+
+// Get all users (admin only)
+export async function getAllUsers() {
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  return usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as User[];
+}
+
+// Subscribe to all users (admin only)
+export function subscribeToAllUsers(callback: (users: User[]) => void) {
+  return onSnapshot(collection(db, "users"), (snapshot) => {
+    const users = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as User[];
+    callback(users);
+  });
+} 
