@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import categoriesData from "@/data/categories.json";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { toast } = useToast();
@@ -18,6 +19,16 @@ const Index = () => {
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
   const [categories, setCategories] = useState(categoriesData);
+  const navigate = useNavigate();
+  const user =
+    JSON.parse(sessionStorage.getItem("user") || "null") ||
+    JSON.parse(localStorage.getItem("user") || "null");
+
+  useEffect(() => {
+    if (user && user.role === "admin") {
+      navigate("/admin/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   // Read categories from localStorage on mount
   useEffect(() => {
