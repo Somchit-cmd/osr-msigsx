@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { subscribeToDepartments } from "@/lib/departmentService";
 
 type AddUserDialogProps = {
   open: boolean;
@@ -18,8 +19,6 @@ type AddUserDialogProps = {
   }) => void;
 };
 
-const departments = ["HR", "Health Claims", "Non-Health Claims", "Underwriting", "Legal & Compliance", "Finance & Accounting", "Sales & Marketing", "Executive"]; // Example departments
-
 export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUserDialogProps) {
   const [newUser, setNewUser] = useState({
     id: "",
@@ -30,6 +29,8 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
     password: "",
     role: "employee",
   });
+
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     if (!open) {
@@ -56,6 +57,11 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newUser.name, newUser.surname]);
 
+  useEffect(() => {
+    const unsubscribe = subscribeToDepartments(setDepartments);
+    return () => unsubscribe();
+  }, []);
+
   const isFormValid =
     newUser.id.trim() &&
     newUser.name.trim() &&
@@ -75,7 +81,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
         </DialogHeader>
@@ -84,7 +90,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
           <div>
             <h3 className="font-semibold mb-2">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="name">First Name</Label>
                 <Input
                   id="name"
@@ -93,7 +99,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                   required
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="surname">Last Name</Label>
                 <Input
                   id="surname"
@@ -102,7 +108,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                   required
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
                 <select
                   id="department"
@@ -111,9 +117,9 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                   onChange={e => setNewUser({ ...newUser, department: e.target.value })}
                   required
                 >
-                  <option value="">Select Department</option>
+                  <option value="">Select department</option>
                   {departments.map(dep => (
-                    <option key={dep} value={dep}>{dep}</option>
+                    <option key={dep.id} value={dep.name}>{dep.name}</option>
                   ))}
                 </select>
               </div>
@@ -123,7 +129,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
           <div>
             <h3 className="font-semibold mb-2">Account Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="id">User ID</Label>
                 <Input
                   id="id"
@@ -132,7 +138,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                   required
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -142,7 +148,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                 />
                 
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
@@ -152,7 +158,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                   required
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
                 <select
                   id="role"

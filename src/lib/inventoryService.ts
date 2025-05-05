@@ -12,23 +12,7 @@ import {
   orderBy,
   Timestamp
 } from "firebase/firestore";
-
-// Types
-export interface InventoryItem {
-  id?: string;
-  name: string;
-  description: string;
-  category: string;
-  quantity: number;
-  unit: string;
-  location?: string;
-  minQuantity: number;
-  maxQuantity: number;
-  imageUrl?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  lastRestocked?: Timestamp;
-}
+import { InventoryItem } from "@/types";
 
 // Get all inventory items
 export async function getInventory() {

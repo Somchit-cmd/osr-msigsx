@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { inventoryItems } from "@/data/mockData";
+import { useState, useEffect } from "react";
+import { subscribeToInventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } from "@/lib/inventoryService";
+import { subscribeToCategories } from "@/lib/categoryService";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
@@ -37,9 +38,29 @@ const AdminInventory = () => {
     quantity: 1,
     notes: "",
   });
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [newItem, setNewItem] = useState({
+    name: "",
+    description: "",
+    category: "",
+    available: 1,
+    totalStock: 1,
+    minQuantity: 1,
+    image: "",
+  });
+  const [editItem, setEditItem] = useState({
+    name: "",
+    description: "",
+    category: "",
+    available: 1,
+    totalStock: 1,
+    minQuantity: 1,
+    image: "",
+  });
   
   // Get unique categories
-  const categories = ["all", ...new Set(inventoryItems.map(item => item.category))];
+  const uniqueCategories = ["all", ...new Set(inventoryItems.map(item => item.category))];
   
   // Filter inventory by category and search query
   const filteredInventory = inventoryItems.filter(item => {
@@ -50,29 +71,62 @@ const AdminInventory = () => {
     return matchesCategory && matchesSearch;
   });
   
-  const handleAddItem = (formData: any) => {
+  useEffect(() => {
+    const unsubscribe = subscribeToInventory(setInventoryItems);
+    const unsubscribeCategories = subscribeToCategories(setCategories);
+    return () => {
+      unsubscribe();
+      unsubscribeCategories();
+    };
+  }, []);
+  
+  useEffect(() => {
+    if (selectedItem) {
+      setEditItem({
+        name: selectedItem.name,
+        description: selectedItem.description,
+        category: selectedItem.category,
+        available: selectedItem.available,
+        totalStock: selectedItem.totalStock,
+        minQuantity: selectedItem.minQuantity,
+        image: selectedItem.image || "",
+      });
+    }
+  }, [selectedItem]);
+  
+  const handleAddItem = async (item) => {
+    await addInventoryItem(item);
     toast({
       title: "Item added",
-      description: `${formData.name} has been added to inventory.`,
+      description: `${item.name} has been added to inventory.`,
     });
     setIsAddDialogOpen(false);
   };
   
-  const handleEditItem = (formData: any) => {
+  const handleEditItem = async (id, updatedFields) => {
+    await updateInventoryItem(id, updatedFields);
     toast({
       title: "Item updated",
-      description: `${formData.name} has been updated.`,
+      description: `${updatedFields.name} has been updated.`,
     });
     setIsEditDialogOpen(false);
   };
   
-  const handleStockAdjustment = () => {
+  const handleStockAdjustment = async () => {
     if (!selectedItem) return;
-    
-    const action = stockAdjustment.type === "increase" ? "increased" : "decreased";
+
+    let newAvailable = selectedItem.available;
+    if (stockAdjustment.type === "increase") {
+      newAvailable += stockAdjustment.quantity;
+    } else {
+      newAvailable = Math.max(0, newAvailable - stockAdjustment.quantity);
+    }
+
+    await updateInventoryItem(selectedItem.id, { available: newAvailable });
+
     toast({
       title: "Stock updated",
-      description: `${selectedItem.name} stock ${action} by ${stockAdjustment.quantity}.`,
+      description: `${selectedItem.name} stock ${stockAdjustment.type === "increase" ? "increased" : "decreased"} by ${stockAdjustment.quantity}.`,
     });
     setIsStockDialogOpen(false);
   };
@@ -86,6 +140,15 @@ const AdminInventory = () => {
     setSelectedItem(item);
     setStockAdjustment({ type, quantity: 1, notes: "" });
     setIsStockDialogOpen(true);
+  };
+
+  const handleRemoveItem = async (id) => {
+    await deleteInventoryItem(id);
+    toast({
+      title: "Item removed",
+      description: `${selectedItem?.name} has been removed from inventory.`,
+    });
+    setIsEditDialogOpen(false);
   };
 
   return (
@@ -127,7 +190,7 @@ const AdminInventory = () => {
                 className="w-full md:w-auto"
               >
                 <TabsList className="grid grid-cols-3 md:grid-cols-5 h-10">
-                  {categories.slice(0, 5).map((category) => (
+                  {uniqueCategories.slice(0, 5).map((category) => (
                     <TabsTrigger key={category} value={category} className="capitalize">
                       {category === "all" ? "All Items" : category}
                     </TabsTrigger>
@@ -145,7 +208,7 @@ const AdminInventory = () => {
                 <TableHead className="bg-gray-100 font-bold">Item</TableHead>
                 <TableHead className="bg-gray-100 font-bold">Category</TableHead>
                 <TableHead className="text-center bg-gray-100 font-bold">Available</TableHead>
-                <TableHead className="text-center bg-gray-100 font-bold">Total Stock</TableHead>
+                <TableHead className="text-center bg-gray-100 font-bold">Max Stock</TableHead>
                 <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
                 <TableHead className="text-right bg-gray-100 font-bold">Actions</TableHead>
               </TableRow>
@@ -188,12 +251,18 @@ const AdminInventory = () => {
                       <Badge
                         variant="outline"
                         className={
-                          item.available <= item.lowStockThreshold
-                            ? "bg-red-100 text-red-800"
-                            : "bg-green-100 text-green-800"
+                          item.available === 0
+                            ? "bg-gray-200 text-gray-700"
+                            : item.available <= item.minQuantity
+                              ? "bg-red-100 text-red-800"
+                              : "bg-green-100 text-green-800"
                         }
                       >
-                        {item.available <= item.lowStockThreshold ? "Low Stock" : "In Stock"}
+                        {item.available === 0
+                          ? "Out of Stock"
+                          : item.available <= item.minQuantity
+                            ? "Low Stock"
+                            : "In Stock"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -234,32 +303,39 @@ const AdminInventory = () => {
       
       {/* Add New Item Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Add New Equipment</DialogTitle>
             <DialogDescription>
               Add a new equipment item to the inventory.
             </DialogDescription>
           </DialogHeader>
-          <form className="space-y-4 py-4">
+          <form className="space-y-4 py-4" onSubmit={e => { e.preventDefault(); handleAddItem(newItem); }}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Equipment Name</Label>
-                <Input id="name" placeholder="Laptop" />
+                <Input
+                  id="name"
+                  value={newItem.name}
+                  onChange={e => setNewItem({ ...newItem, name: e.target.value })}
+                  required
+                  placeholder="Item name"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Electronics">Electronics</SelectItem>
-                    <SelectItem value="Furniture">Furniture</SelectItem>
-                    <SelectItem value="Office Supplies">Office Supplies</SelectItem>
-                    <SelectItem value="Presentation">Presentation</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select
+                  id="category"
+                  value={newItem.category}
+                  onChange={e => setNewItem({ ...newItem, category: e.target.value })}
+                  required
+                  className="w-full border rounded px-2 py-2"
+                >
+                  <option value="">Select category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
             
@@ -267,22 +343,71 @@ const AdminInventory = () => {
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
+                value={newItem.description}
+                onChange={e => setNewItem({ ...newItem, description: e.target.value })}
                 placeholder="Brief description of the equipment..."
                 rows={3}
+                required
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="initialStock">Initial Stock</Label>
-                <Input id="initialStock" type="number" min={1} defaultValue={1} />
+                <Label htmlFor="available">Available</Label>
+                <Input
+                  id="available"
+                  type="number"
+                  min={0}
+                  value={newItem.available}
+                  onChange={e => setNewItem({ ...newItem, available: Number(e.target.value) })}
+                  required
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lowStockThreshold">Low Stock Threshold</Label>
-                <Input id="lowStockThreshold" type="number" min={1} defaultValue={3} />
+                <Label htmlFor="totalStock">Total Stock</Label>
+                <Input
+                  id="totalStock"
+                  type="number"
+                  min={0}
+                  value={newItem.totalStock}
+                  onChange={e => setNewItem({ ...newItem, totalStock: Number(e.target.value) })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="minQuantity">Min Quantity</Label>
+                <Input
+                  id="minQuantity"
+                  type="number"
+                  min={1}
+                  value={newItem.minQuantity}
+                  onChange={e => setNewItem({ ...newItem, minQuantity: Number(e.target.value) })}
+                  required
+                />
               </div>
             </div>
-
+            
+            <div className="space-y-2">
+              <Label htmlFor="image">Image (optional)</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setNewItem(prev => ({ ...prev, image: reader.result as string }));
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+              {newItem.image && (
+                <img src={newItem.image} alt="Preview" className="w-16 h-16 object-contain mt-2" />
+              )}
+            </div>
+            
             <DialogFooter>
               <Button 
                 type="button" 
@@ -292,8 +417,8 @@ const AdminInventory = () => {
                 Cancel
               </Button>
               <Button 
-                type="button" 
-                onClick={() => handleAddItem({ name: "New Item" })}
+                type="submit"
+                disabled={!newItem.name || !newItem.category || !newItem.description}
               >
                 Add Item
               </Button>
@@ -304,75 +429,137 @@ const AdminInventory = () => {
       
       {/* Edit Item Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Edit Equipment</DialogTitle>
             <DialogDescription>
               Update equipment details and settings.
             </DialogDescription>
           </DialogHeader>
-          <form className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-name">Equipment Name</Label>
-                <Input 
-                  id="edit-name" 
-                  defaultValue={selectedItem?.name || ""} 
-                />
+          {selectedItem && (
+            <form
+              className="space-y-4 py-4"
+              onSubmit={e => {
+                e.preventDefault();
+                handleEditItem(selectedItem.id, editItem);
+              }}
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">Equipment Name</Label>
+                  <Input
+                    id="edit-name"
+                    value={editItem.name}
+                    onChange={e => setEditItem({ ...editItem, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-category">Category</Label>
+                  <select
+                    id="edit-category"
+                    value={editItem.category}
+                    onChange={e => setEditItem({ ...editItem, category: e.target.value })}
+                    required
+                    className="w-full border rounded px-2 py-2"
+                  >
+                    <option value="">Select category</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-category">Category</Label>
-                <Select defaultValue={selectedItem?.category}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Electronics">Electronics</SelectItem>
-                    <SelectItem value="Furniture">Furniture</SelectItem>
-                    <SelectItem value="Office Supplies">Office Supplies</SelectItem>
-                    <SelectItem value="Presentation">Presentation</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="edit-description">Description</Label>
-              <Textarea
-                id="edit-description"
-                defaultValue={selectedItem?.description || ""}
-                rows={3}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-lowStockThreshold">Low Stock Threshold</Label>
-                <Input 
-                  id="edit-lowStockThreshold" 
-                  type="number" 
-                  min={1} 
-                  defaultValue={selectedItem?.lowStockThreshold || 3} 
-                />
-              </div>
-            </div>
 
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsEditDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="button" 
-                onClick={() => handleEditItem({ name: selectedItem?.name || "Item" })}
-              >
-                Save Changes
-              </Button>
-            </DialogFooter>
-          </form>
+              <div className="space-y-2">
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editItem.description}
+                  onChange={e => setEditItem({ ...editItem, description: e.target.value })}
+                  required
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-available">Available</Label>
+                  <Input
+                    id="edit-available"
+                    type="number"
+                    min={0}
+                    value={editItem.available}
+                    onChange={e => setEditItem({ ...editItem, available: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-totalStock">Total Stock</Label>
+                  <Input
+                    id="edit-totalStock"
+                    type="number"
+                    min={0}
+                    value={editItem.totalStock}
+                    onChange={e => setEditItem({ ...editItem, totalStock: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-minQuantity">Min Quantity</Label>
+                  <Input
+                    id="edit-minQuantity"
+                    type="number"
+                    min={1}
+                    value={editItem.minQuantity}
+                    onChange={e => setEditItem({ ...editItem, minQuantity: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-image">Image (optional)</Label>
+                <Input
+                  id="edit-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setEditItem(prev => ({ ...prev, image: reader.result as string }));
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+                {editItem.image && (
+                  <img src={editItem.image} alt="Preview" className="w-16 h-16 object-contain mt-2" />
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={
+                    !editItem.name ||
+                    !editItem.category ||
+                    !editItem.description
+                  }
+                >
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
       

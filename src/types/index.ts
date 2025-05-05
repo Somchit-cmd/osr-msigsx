@@ -1,10 +1,8 @@
-
 export type Equipment = {
   id: string;
   name: string;
   category: string;
   description: string;
-  available: number;
   image: string;
 };
 
@@ -38,9 +36,14 @@ export type Employee = {
 };
 
 export type InventoryItem = Equipment & {
+  available: number;
   totalStock: number;
   reserved: number;
   lowStockThreshold: number;
+  minQuantity: number;
+  updatedAt: any;
+  createdAt: any;
+  lastRestocked?: any;
 };
 
 export type User = {

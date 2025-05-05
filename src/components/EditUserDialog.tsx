@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { subscribeToDepartments } from "@/lib/departmentService";
 
 type EditUserDialogProps = {
   open: boolean;
@@ -33,14 +34,13 @@ type EditUserDialogProps = {
   }) => void;
 };
 
-const departments = ["HR", "Health Claims", "Non-Health Claims", "Underwriting", "Legal & Compliance", "Finance & Accounting", "Sales & Marketing", "Executive"];
-
 export default function EditUserDialog({
   open,
   onOpenChange,
   user,
   onEditUser,
 }: EditUserDialogProps) {
+  const [departments, setDepartments] = useState([]);
   const [editUser, setEditUser] = useState({
     id: "",
     name: "",
@@ -66,9 +66,16 @@ export default function EditUserDialog({
   }, [user, open]);
 
   useEffect(() => {
+    const unsubscribe = subscribeToDepartments(setDepartments);
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     if (editUser.name && editUser.surname) {
-      const email = `${editUser.name.trim().toLowerCase()}.${editUser.surname.trim().toLowerCase()}@msig-sokxay.com`;
-      setEditUser(prev => ({ ...prev, email }));
+      const email = `${editUser.name.trim().toLowerCase()}.${editUser.surname
+        .trim()
+        .toLowerCase()}@msig-sokxay.com`;
+      setEditUser((prev) => ({ ...prev, email }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editUser.name, editUser.surname]);
@@ -99,36 +106,50 @@ export default function EditUserDialog({
           <div>
             <h3 className="font-semibold mb-2">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name" className="mb-2">First Name</Label>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="mb-2">
+                  First Name
+                </Label>
                 <Input
                   id="name"
                   value={editUser.name}
-                  onChange={e => setEditUser({ ...editUser, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditUser({ ...editUser, name: e.target.value })
+                  }
                   required
                 />
               </div>
-              <div>
-                <Label htmlFor="surname" className="mb-2">Last Name</Label>
+              <div className="space-y-2">
+                <Label htmlFor="surname" className="mb-2">
+                  Last Name
+                </Label>
                 <Input
                   id="surname"
                   value={editUser.surname}
-                  onChange={e => setEditUser({ ...editUser, surname: e.target.value })}
+                  onChange={(e) =>
+                    setEditUser({ ...editUser, surname: e.target.value })
+                  }
                   required
                 />
               </div>
-              <div>
-                <Label htmlFor="department" className="mb-2">Department</Label>
+              <div className="space-y-2">
+                <Label htmlFor="department" className="mb-2">
+                  Department
+                </Label>
                 <select
                   id="department"
                   className="w-full border rounded px-2 py-2"
                   value={editUser.department}
-                  onChange={e => setEditUser({ ...editUser, department: e.target.value })}
+                  onChange={(e) =>
+                    setEditUser({ ...editUser, department: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Department</option>
-                  {departments.map(dep => (
-                    <option key={dep} value={dep}>{dep}</option>
+                  {departments.map((dep) => (
+                    <option key={dep.id} value={dep.name}>
+                      {dep.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -137,19 +158,25 @@ export default function EditUserDialog({
           <div>
             <h3 className="font-semibold mb-2">Account Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="id" className="mb-2">User ID</Label>
+              <div className="space-y-2">
+                <Label htmlFor="id" className="mb-2">
+                  User ID
+                </Label>
                 <Input
                   id="id"
                   value={editUser.id}
-                  onChange={e => setEditUser({ ...editUser, id: e.target.value })}
+                  onChange={(e) =>
+                    setEditUser({ ...editUser, id: e.target.value })
+                  }
                   required
                   readOnly
                   className="bg-gray-100 cursor-not-allowed"
                 />
               </div>
-              <div>
-                <Label htmlFor="email" className="mb-2">Email</Label>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="mb-2">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   value={editUser.email}
@@ -157,13 +184,17 @@ export default function EditUserDialog({
                   className="bg-gray-100 cursor-not-allowed"
                 />
               </div>
-              <div>
-                <Label htmlFor="role" className="mb-2">Role</Label>
+              <div className="space-y-2">
+                <Label htmlFor="role" className="mb-2">
+                  Role
+                </Label>
                 <select
                   id="role"
                   className="w-full border rounded px-2 py-2"
                   value={editUser.role}
-                  onChange={e => setEditUser({ ...editUser, role: e.target.value })}
+                  onChange={(e) =>
+                    setEditUser({ ...editUser, role: e.target.value })
+                  }
                   required
                 >
                   <option value="employee">Employee</option>
