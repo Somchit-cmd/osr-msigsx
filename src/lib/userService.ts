@@ -13,7 +13,8 @@ import {
   getDocs,
   setDoc,
   updateDoc,
-  onSnapshot
+  onSnapshot,
+  deleteDoc
 } from "firebase/firestore";
 
 // Types
@@ -114,4 +115,25 @@ export function subscribeToAllUsers(callback: (users: User[]) => void) {
     })) as User[];
     callback(users);
   });
+}
+
+// Add a new user
+export async function addUser(newUser: User) {
+  await setDoc(doc(db, "users", newUser.id), {
+    ...newUser,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+}
+
+// Edit an existing user
+export async function editUser(user) {
+  const userRef = doc(db, "users", user.id);
+  await updateDoc(userRef, { ...user, updatedAt: new Date() });
+}
+
+// Remove a user
+export async function removeUser(userId) {
+  const userRef = doc(db, "users", userId);
+  await deleteDoc(userRef);
 } 

@@ -8,44 +8,62 @@ type AddUserDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddUser: (user: {
-    username: string;
+    id: string;
     name: string;
     surname: string;
-    role: string;
+    department: string;
     email: string;
-    phone: string;
+    password: string;
+    role: string;
   }) => void;
 };
 
+const departments = ["HR", "Health Claims", "Non-Health Claims", "Underwriting", "Legal & Compliance", "Finance & Accounting", "Sales & Marketing", "Executive"]; // Example departments
+
 export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUserDialogProps) {
   const [newUser, setNewUser] = useState({
-    username: "",
+    id: "",
     name: "",
     surname: "",
-    role: "employee",
+    department: "",
     email: "",
-    phone: "",
+    password: "",
+    role: "employee",
   });
 
   useEffect(() => {
     if (!open) {
       setNewUser({
-        username: "",
+        id: "",
         name: "",
         surname: "",
-        role: "employee",
+        department: "",
         email: "",
-        phone: "",
+        password: "",
+        role: "employee",
       });
     }
   }, [open]);
 
+  // Auto-generate email when name or surname changes
+  useEffect(() => {
+    if (newUser.name && newUser.surname) {
+      const email = `${newUser.name.trim().toLowerCase()}.${newUser.surname.trim().toLowerCase()}@msig-sokxay.com`;
+      setNewUser(prev => ({ ...prev, email }));
+    } else {
+      setNewUser(prev => ({ ...prev, email: "" }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newUser.name, newUser.surname]);
+
   const isFormValid =
-    newUser.username.trim() &&
+    newUser.id.trim() &&
     newUser.name.trim() &&
     newUser.surname.trim() &&
+    newUser.department.trim() &&
     newUser.email.trim() &&
-    newUser.phone.trim();
+    newUser.password.trim() &&
+    newUser.role.trim();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,70 +75,96 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
         </DialogHeader>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="username" >Username</Label>
-              <Input
-                id="username"
-                value={newUser.username}
-                onChange={e => setNewUser({ ...newUser, username: e.target.value })}
-                required
-              />
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Personal Information */}
+          <div>
+            <h3 className="font-semibold mb-2">Personal Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">First Name</Label>
+                <Input
+                  id="name"
+                  value={newUser.name}
+                  onChange={e => setNewUser({ ...newUser, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="surname">Last Name</Label>
+                <Input
+                  id="surname"
+                  value={newUser.surname}
+                  onChange={e => setNewUser({ ...newUser, surname: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="department">Department</Label>
+                <select
+                  id="department"
+                  className="w-full border rounded px-2 py-2"
+                  value={newUser.department}
+                  onChange={e => setNewUser({ ...newUser, department: e.target.value })}
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(dep => (
+                    <option key={dep} value={dep}>{dep}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="role" className="mb-2 block">Role</Label>
-              <select
-                id="role"
-                className="w-full border rounded px-2 py-2"
-                value={newUser.role}
-                onChange={e => setNewUser({ ...newUser, role: e.target.value })}
-              >
-                <option value="employee">Employee</option>
-                <option value="admin">Admin</option>
+          </div>
+          {/* Account Information */}
+          <div>
+            <h3 className="font-semibold mb-2">Account Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="id">User ID</Label>
+                <Input
+                  id="id"
+                  value={newUser.id}
+                  onChange={e => setNewUser({ ...newUser, id: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  value={newUser.email}
+                  readOnly
+                  className="bg-gray-100 cursor-not-allowed"
+                />
                 
-              </select>
-            </div>
-            <div>
-              <Label htmlFor="name" className="mb-2 block">Name</Label>
-              <Input
-                id="name"
-                value={newUser.name}
-                onChange={e => setNewUser({ ...newUser, name: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="surname" className="mb-2 block">Surname</Label>
-              <Input
-                id="surname"
-                value={newUser.surname}
-                onChange={e => setNewUser({ ...newUser, surname: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email" className="mb-2 block">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={newUser.email}
-                onChange={e => setNewUser({ ...newUser, email: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone" className="mb-2 block">Phone</Label>
-              <Input
-                id="phone"
-                value={newUser.phone}
-                onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
-                required
-              />
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={newUser.password}
+                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="role">Role</Label>
+                <select
+                  id="role"
+                  className="w-full border rounded px-2 py-2"
+                  value={newUser.role}
+                  onChange={e => setNewUser({ ...newUser, role: e.target.value })}
+                  required
+                >
+                  <option value="employee">Employee</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
             </div>
           </div>
           <DialogFooter>

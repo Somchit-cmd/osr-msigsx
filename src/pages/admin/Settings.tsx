@@ -11,26 +11,18 @@ import { Label } from "@/components/ui/label";
 import AddUserDialog from "@/components/AddUserDialog";
 import EditUserDialog from "@/components/EditUserDialog";
 import RemoveUserDialog from "@/components/RemoveUserDialog";
-import ResetPasswordDialog from "@/components/ResetPasswordDialog";
-import SetRoleDialog from "@/components/SetRoleDialog";
 import AddCategoryDialog from "@/components/AddCategoryDialog";
 import EditCategoryDialog from "@/components/EditCategoryDialog";
 import RemoveCategoryDialog from "@/components/RemoveCategoryDialog";
+import { subscribeToAllUsers, addUser, editUser, removeUser } from "@/lib/userService";
+import { subscribeToCategories, addCategory, editCategory, removeCategory } from "@/lib/categoryService";
 
 export default function AdminSettings() {
-  // For demo, use local state. In a real app, use context or API.
-  const [users, setUsers] = useState(
-    usersData.map((user, idx) => ({
-      ...user,
-      id: (user as any).id || user.username || String(idx),
-    }))
-  );
-  const [categories, setCategories] = useState(categoriesData);
+  const [users, setUsers] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
   const [isRemoveUserDialogOpen, setIsRemoveUserDialogOpen] = useState(false);
-  const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
-  const [isSetRoleDialogOpen, setIsSetRoleDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newUser, setNewUser] = useState({
     username: "",
@@ -43,7 +35,7 @@ export default function AdminSettings() {
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
   const [isEditCategoryDialogOpen, setIsEditCategoryDialogOpen] = useState(false);
   const [isRemoveCategoryDialogOpen, setIsRemoveCategoryDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<{ id: string, name: string } | null>(null);
 
   const isFormValid =
     newUser.username.trim() &&
@@ -52,58 +44,42 @@ export default function AdminSettings() {
     newUser.email.trim() &&
     newUser.phone.trim();
 
-  // Read categories from localStorage on mount
+  // Subscribe to Firestore users collection
   useEffect(() => {
-    const localCategories = localStorage.getItem("categories");
-    if (localCategories) {
-      setCategories(JSON.parse(localCategories));
-    }
+    const unsubscribe = subscribeToAllUsers(setUsers);
+    return () => unsubscribe();
   }, []);
 
-  // Update localStorage when categories change
+  // Subscribe to Firestore categories
   useEffect(() => {
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }, [categories]);
+    const unsubscribe = subscribeToCategories(setCategories);
+    return () => unsubscribe();
+  }, []);
 
-  const handleAddUser = (user) => {
-    setUsers([
-      ...users,
-      {
-        ...user,
-        id: Date.now().toString(),
-        password: "password",
-        department: "HR",
-        title: "Employee",
-      },
-    ]);
+  const handleAddUser = async (user) => {
+    await addUser(user);
   };
 
-  const handleEditUser = (updatedUser) => {
-    setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
+  const handleEditUser = async (user) => {
+    await editUser(user);
   };
 
-  const handleRemoveUser = () => {
-    setUsers(users.filter(u => u.id !== selectedUser.id));
+  const handleRemoveUser = async () => {
+    if (selectedUser) {
+      await removeUser(selectedUser.id);
+    }
   };
 
-  const handleResetPassword = (newPassword) => {
-    setUsers(users.map(u => u.id === selectedUser.id ? { ...u, password: newPassword } : u));
+  const handleAddCategory = async (categoryName: string) => {
+    await addCategory(categoryName);
   };
 
-  const handleSetRole = (role) => {
-    setUsers(users.map(u => u.id === selectedUser.id ? { ...u, role } : u));
+  const handleEditCategory = async (id: string, newName: string) => {
+    await editCategory(id, newName);
   };
 
-  const handleAddCategory = (category: string) => {
-    setCategories([...categories, category]);
-  };
-
-  const handleEditCategory = (newCategory: string) => {
-    setCategories(categories.map(cat => cat === selectedCategory ? newCategory : cat));
-  };
-
-  const handleRemoveCategory = () => {
-    setCategories(categories.filter(cat => cat !== selectedCategory));
+  const handleRemoveCategory = async (id: string) => {
+    await removeCategory(id);
   };
 
   return (
@@ -130,6 +106,7 @@ export default function AdminSettings() {
                 <tr className="bg-gray-100">
                   <th className="p-3 text-left font-medium rounded-tl-xl">Username</th>
                   <th className="p-3 text-left font-medium">Name</th>
+                  <th className="p-3 text-left font-medium">Department</th>
                   <th className="p-3 text-left font-medium">Role</th>
                   <th className="p-3 text-left font-medium rounded-tr-xl">Actions</th>
                 </tr>
@@ -137,8 +114,9 @@ export default function AdminSettings() {
               <tbody>
                 {users.map((user, idx) => (
                   <tr key={idx} className="hover:bg-gray-50 transition">
-                    <td className="p-3 border-b">{user.username}</td>
+                    <td className="p-3 border-b">{user.id}</td>
                     <td className="p-3 border-b">{user.name} {user.surname}</td>
+                    <td className="p-3 border-b">{user.department}</td>
                     <td className="p-3 border-b">{user.role}</td>
                     <td className="p-3 border-b">
                       <Button
@@ -154,20 +132,6 @@ export default function AdminSettings() {
                         onClick={() => { setSelectedUser(user); setIsRemoveUserDialogOpen(true); }}
                       >
                         Remove
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="mr-2 bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100"
-                        onClick={() => { setSelectedUser(user); setIsResetPasswordDialogOpen(true); }}
-                      >
-                        Reset Password
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100"
-                        onClick={() => { setSelectedUser(user); setIsSetRoleDialogOpen(true); }}
-                      >
-                        Set Role
                       </Button>
                     </td>
                   </tr>
@@ -200,9 +164,9 @@ export default function AdminSettings() {
                 </tr>
               </thead>
               <tbody>
-                {categories.map((cat, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 transition">
-                    <td className="p-3 border-b">{cat}</td>
+                {categories.map((cat) => (
+                  <tr key={cat.id} className="hover:bg-gray-50 transition">
+                    <td className="p-3 border-b">{cat.name}</td>
                     <td className="p-3 border-b">
                       <Button
                         size="sm"
@@ -246,18 +210,6 @@ export default function AdminSettings() {
         user={selectedUser}
         onRemoveUser={handleRemoveUser}
       />
-      <ResetPasswordDialog
-        open={isResetPasswordDialogOpen}
-        onOpenChange={setIsResetPasswordDialogOpen}
-        user={selectedUser}
-        onResetPassword={handleResetPassword}
-      />
-      <SetRoleDialog
-        open={isSetRoleDialogOpen}
-        onOpenChange={setIsSetRoleDialogOpen}
-        user={selectedUser}
-        onSetRole={handleSetRole}
-      />
       <AddCategoryDialog
         open={isAddCategoryDialogOpen}
         onOpenChange={setIsAddCategoryDialogOpen}
@@ -266,14 +218,18 @@ export default function AdminSettings() {
       <EditCategoryDialog
         open={isEditCategoryDialogOpen}
         onOpenChange={setIsEditCategoryDialogOpen}
-        category={selectedCategory || ""}
-        onEditCategory={handleEditCategory}
+        category={selectedCategory}
+        onEditCategory={(newName) => {
+          if (selectedCategory) handleEditCategory(selectedCategory.id, newName);
+        }}
       />
       <RemoveCategoryDialog
         open={isRemoveCategoryDialogOpen}
         onOpenChange={setIsRemoveCategoryDialogOpen}
-        category={selectedCategory || ""}
-        onRemoveCategory={handleRemoveCategory}
+        category={selectedCategory ? selectedCategory.name : ""}
+        onRemoveCategory={() => {
+          if (selectedCategory) handleRemoveCategory(selectedCategory.id);
+        }}
       />
     </div>
   );

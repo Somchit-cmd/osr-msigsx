@@ -13,9 +13,27 @@ import { useState, useEffect } from "react";
 type EditUserDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: any;
-  onEditUser: (user: any) => void;
+  user: {
+    id: string;
+    name: string;
+    surname: string;
+    department: string;
+    email: string;
+    password?: string;
+    role: string;
+  } | null;
+  onEditUser: (user: {
+    id: string;
+    name: string;
+    surname: string;
+    department: string;
+    email: string;
+    password?: string;
+    role: string;
+  }) => void;
 };
+
+const departments = ["HR", "Health Claims", "Non-Health Claims", "Underwriting", "Legal & Compliance", "Finance & Accounting", "Sales & Marketing", "Executive"];
 
 export default function EditUserDialog({
   open,
@@ -23,20 +41,45 @@ export default function EditUserDialog({
   user,
   onEditUser,
 }: EditUserDialogProps) {
-  const [editUser, setEditUser] = useState(user);
+  const [editUser, setEditUser] = useState({
+    id: "",
+    name: "",
+    surname: "",
+    department: "",
+    email: "",
+    password: "",
+    role: "employee",
+  });
 
   useEffect(() => {
-    setEditUser(user);
+    if (user && open) {
+      setEditUser({
+        id: user.id || "",
+        name: user.name || "",
+        surname: user.surname || "",
+        department: user.department || "",
+        email: user.email || "",
+        password: "",
+        role: user.role || "employee",
+      });
+    }
   }, [user, open]);
 
-  if (!editUser) return null;
+  useEffect(() => {
+    if (editUser.name && editUser.surname) {
+      const email = `${editUser.name.trim().toLowerCase()}.${editUser.surname.trim().toLowerCase()}@msig-sokxay.com`;
+      setEditUser(prev => ({ ...prev, email }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editUser.name, editUser.surname]);
 
   const isFormValid =
-    editUser.username?.trim() &&
-    editUser.name?.trim() &&
-    editUser.surname?.trim() &&
-    editUser.email?.trim() &&
-    editUser.phone?.trim();
+    editUser.id.trim() &&
+    editUser.name.trim() &&
+    editUser.surname.trim() &&
+    editUser.department.trim() &&
+    editUser.email.trim() &&
+    editUser.role.trim();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,93 +91,85 @@ export default function EditUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
         </DialogHeader>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="username" className="mb-2 block">
-                Username
-              </Label>
-              <Input
-                id="username"
-                value={editUser.username}
-                onChange={(e) =>
-                  setEditUser({ ...editUser, username: e.target.value })
-                }
-                required
-              />
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <h3 className="font-semibold mb-2">Personal Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name" className="mb-2">First Name</Label>
+                <Input
+                  id="name"
+                  value={editUser.name}
+                  onChange={e => setEditUser({ ...editUser, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="surname" className="mb-2">Last Name</Label>
+                <Input
+                  id="surname"
+                  value={editUser.surname}
+                  onChange={e => setEditUser({ ...editUser, surname: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="department" className="mb-2">Department</Label>
+                <select
+                  id="department"
+                  className="w-full border rounded px-2 py-2"
+                  value={editUser.department}
+                  onChange={e => setEditUser({ ...editUser, department: e.target.value })}
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(dep => (
+                    <option key={dep} value={dep}>{dep}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="role" className="mb-2 block">
-                Role
-              </Label>
-              <select
-                id="role"
-                className="w-full border rounded px-2 py-2"
-                value={editUser.role}
-                onChange={(e) =>
-                  setEditUser({ ...editUser, role: e.target.value })
-                }
-              >
-                <option value="employee">Employee</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-            <div>
-              <Label htmlFor="name" className="mb-2 block">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={editUser.name}
-                onChange={(e) =>
-                  setEditUser({ ...editUser, name: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="surname" className="mb-2 block">
-                Surname
-              </Label>
-              <Input
-                id="surname"
-                value={editUser.surname}
-                onChange={(e) =>
-                  setEditUser({ ...editUser, surname: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email" className="mb-2 block">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={editUser.email}
-                onChange={(e) =>
-                  setEditUser({ ...editUser, email: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone" className="mb-2 block">
-                Phone
-              </Label>
-              <Input
-                id="phone"
-                value={editUser.phone}
-                onChange={(e) =>
-                  setEditUser({ ...editUser, phone: e.target.value })
-                }
-                required
-              />
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">Account Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="id" className="mb-2">User ID</Label>
+                <Input
+                  id="id"
+                  value={editUser.id}
+                  onChange={e => setEditUser({ ...editUser, id: e.target.value })}
+                  required
+                  readOnly
+                  className="bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email" className="mb-2">Email</Label>
+                <Input
+                  id="email"
+                  value={editUser.email}
+                  readOnly
+                  className="bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <Label htmlFor="role" className="mb-2">Role</Label>
+                <select
+                  id="role"
+                  className="w-full border rounded px-2 py-2"
+                  value={editUser.role}
+                  onChange={e => setEditUser({ ...editUser, role: e.target.value })}
+                  required
+                >
+                  <option value="employee">Employee</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
             </div>
           </div>
           <DialogFooter>

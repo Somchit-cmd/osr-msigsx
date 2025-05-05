@@ -7,15 +7,15 @@ import { useState, useEffect } from "react";
 type EditCategoryDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  category: string;
+  category: { id: string, name: string } | null;
   onEditCategory: (newCategory: string) => void;
 };
 
 export default function EditCategoryDialog({ open, onOpenChange, category, onEditCategory }: EditCategoryDialogProps) {
-  const [newCategory, setNewCategory] = useState(category);
+  const [newCategory, setNewCategory] = useState(category?.name || "");
 
   useEffect(() => {
-    setNewCategory(category);
+    setNewCategory(category?.name || "");
   }, [category, open]);
 
   return (

@@ -30,7 +30,7 @@ export default function AddCategoryDialog({ open, onOpenChange, onAddCategory }:
             onOpenChange(false);
           }}
         >
-          <Label htmlFor="category-name" className="mb-2">Category Name</Label>
+          <Label htmlFor="category-name" className="mb-4">Category Name</Label>
           <Input
             id="category-name"
             value={category}
