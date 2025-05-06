@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { subscribeToInventory } from "@/lib/inventoryService";
 import { subscribeToAllRequests } from "@/lib/requestService";
 import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs, Timestamp } from "firebase/firestore";
+import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from "firebase/firestore";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -151,13 +151,24 @@ const AdminDashboard = () => {
     .filter((request) => request.status === "pending")
     .slice(0, 5); // Only show 5 most recent
 
-  const handleAction = (
+  const handleAction = async (
     id: string,
     action: "approve" | "reject" | "fulfill"
   ) => {
+    const statusMap = {
+      approve: "approved",
+      reject: "rejected",
+      fulfill: "fulfilled"
+    };
+    let update: any = { status: statusMap[action] };
+    if (action === "approve") update.approvedAt = Timestamp.now();
+    if (action === "fulfill") update.fulfilledAt = Timestamp.now();
+
+    await updateDoc(doc(db, "requests", id), update);
+
     toast({
-      title: `Request ${action}ed`,
-      description: `Request #${id} has been ${action}ed successfully.`,
+      title: `Request ${statusMap[action]}`,
+      description: `Request #${id} has been ${statusMap[action]} successfully.`,
     });
   };
 

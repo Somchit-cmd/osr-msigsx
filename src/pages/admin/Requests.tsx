@@ -57,15 +57,20 @@ const AdminRequests = () => {
   const fulfilledCount = requests.filter(req => req.status === "fulfilled").length;
   
   const handleAction = async (id: string, action: 'approve' | 'reject' | 'fulfill') => {
-    let update: any = { status: action };
+    const statusMap = {
+      approve: "approved",
+      reject: "rejected",
+      fulfill: "fulfilled"
+    };
+    let update: any = { status: statusMap[action] };
     if (action === "approve") update.approvedAt = Timestamp.now();
     if (action === "fulfill") update.fulfilledAt = Timestamp.now();
 
     await updateDoc(doc(db, "requests", id), update);
 
     toast({
-      title: `Request ${action}d`,
-      description: `Request #${id} has been ${action}d successfully.`,
+      title: `Request ${statusMap[action]}`,
+      description: `Request #${id} has been ${statusMap[action]} successfully.`,
     });
   };
   
