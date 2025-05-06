@@ -3,8 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequestTable from "@/components/RequestTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { subscribeToUserRequests } from "@/lib/requestService";
 
 const user =
   JSON.parse(sessionStorage.getItem("user") || "null") ||
@@ -25,51 +24,52 @@ const MyRequests = () => {
   const fulfilledCount = myRequests.filter(req => req.status === "fulfilled").length;
 
   useEffect(() => {
-    if (!user) return;
-    const fetchRequests = async () => {
-      const q = query(
-        collection(db, "requests"),
-        where("employeeId", "==", user.id)
-      );
-      const snap = await getDocs(q);
-      setMyRequests(
-        snap.docs
-          .map(doc => ({ id: doc.id, ...doc.data() } as { id: string, createdAt: { toDate: () => Date } | { seconds: number, nanoseconds: number } }))
-          .sort((a, b) => {
-            const aTime = 'toDate' in a.createdAt ? a.createdAt.toDate().getTime() : new Date(a.createdAt.seconds * 1000).getTime();
-            const bTime = 'toDate' in b.createdAt ? b.createdAt.toDate().getTime() : new Date(b.createdAt.seconds * 1000).getTime();
-            return bTime - aTime; // Newest first
-          })
-      );
+    console.log("Current user object:", user); // Debug log for full user object
+
+    if (!user) {
+      console.log("No user found, returning early");
+      return;
+    }
+
+    // Check if we have the correct user ID
+    if (!user.id) {
+      console.error("No user ID found in user object:", user);
+      return;
+    }
+    
+    console.log("Using user ID for subscription:", user.id);
+    
+    // Subscribe to real-time updates for user's requests
+    const unsubscribe = subscribeToUserRequests(user.id, (requests) => {
+      console.log("Received requests update:", requests);
+      setMyRequests(requests);
+    });
+
+    // Cleanup subscription on component unmount
+    return () => {
+      console.log("Cleaning up subscription");
+      unsubscribe();
     };
-    fetchRequests();
   }, [user]);
+
+  // Debug log for current requests
+  useEffect(() => {
+    console.log("Current requests state:", myRequests);
+  }, [myRequests]);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header user={user} />
-      
+      <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">My Supply Requests</h1>
-        <p className="text-text-muted mb-8">Track and manage your office supply requests</p>
+        <h1 className="text-3xl font-bold mb-8">My Requests</h1>
         
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-4 md:grid-cols-5 h-auto mb-6">
-            <TabsTrigger value="all" className="px-4 py-2">
-              All ({myRequests.length})
-            </TabsTrigger>
-            <TabsTrigger value="pending" className="px-4 py-2">
-              Pending ({pendingCount})
-            </TabsTrigger>
-            <TabsTrigger value="approved" className="px-4 py-2">
-              Approved ({approvedCount})
-            </TabsTrigger>
-            <TabsTrigger value="rejected" className="px-4 py-2">
-              Rejected ({rejectedCount})
-            </TabsTrigger>
-            <TabsTrigger value="fulfilled" className="px-4 py-2">
-              Fulfilled ({fulfilledCount})
-            </TabsTrigger>
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="all">All ({myRequests.length})</TabsTrigger>
+            <TabsTrigger value="pending">Pending ({pendingCount})</TabsTrigger>
+            <TabsTrigger value="approved">Approved ({approvedCount})</TabsTrigger>
+            <TabsTrigger value="rejected">Rejected ({rejectedCount})</TabsTrigger>
+            <TabsTrigger value="fulfilled">Fulfilled ({fulfilledCount})</TabsTrigger>
           </TabsList>
           
           <TabsContent value={activeTab}>
@@ -77,7 +77,6 @@ const MyRequests = () => {
           </TabsContent>
         </Tabs>
       </main>
-      
       <Footer />
     </div>
   );

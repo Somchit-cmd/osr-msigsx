@@ -70,7 +70,14 @@ export default function RequestForm({
       const user =
         JSON.parse(sessionStorage.getItem("user") || "null") ||
         JSON.parse(localStorage.getItem("user") || "null");
-      await addDoc(collection(db, "requests"), {
+      
+      console.log("Creating request with user:", user); // Debug log
+      
+      if (!user || !user.id) {
+        throw new Error("No user ID found");
+      }
+
+      const requestData = {
         ...formData,
         equipmentId: equipment.id,
         equipmentName: equipment.name,
@@ -79,12 +86,20 @@ export default function RequestForm({
         department: user.department,
         status: "pending",
         createdAt: Timestamp.now(),
-      });
+        updatedAt: Timestamp.now(),
+      };
+
+      console.log("Submitting request with data:", requestData); // Debug log
+
+      const docRef = await addDoc(collection(db, "requests"), requestData);
+      console.log("Request created with ID:", docRef.id); // Debug log
+
       toast({
         title: "Request submitted successfully",
         description: `Your request for ${formData.quantity} ${formData.equipmentName}(s) is being processed.`,
       });
     } catch (error) {
+      console.error("Error creating request:", error); // Debug log
       toast({
         title: "Error submitting request",
         description: "There was a problem submitting your request. Please try again.",
