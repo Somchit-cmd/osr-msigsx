@@ -16,6 +16,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import users from "@/data/users.json";
 import logo from "@/assets/logo-png-only.webp";
 import { authenticate } from "@/lib/authService";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,34 +33,44 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
-    const user = await authenticate(employeeId, password);
-    if (user) {
-      // Clear previous sessions
-      localStorage.removeItem("user");
-      sessionStorage.removeItem("user");
-      // Store user session based on "Remember me"
-      if (rememberMe) {
-        localStorage.setItem("user", JSON.stringify(user));
+    const userDoc = await getDoc(doc(db, "users", employeeId));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      if (userData.password === password) {
+        // Clear previous sessions
+        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
+        // Store user session based on "Remember me"
+        if (rememberMe) {
+          localStorage.setItem("user", JSON.stringify(userData));
+        } else {
+          sessionStorage.setItem("user", JSON.stringify(userData));
+        }
+        toast({
+          title: "Login successful",
+          description: `Welcome, ${userData.name} ${userData.surname}!`,
+        });
+        // Redirect based on role
+        if (userData.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
       } else {
-        sessionStorage.setItem("user", JSON.stringify(user));
-      }
-      toast({
-        title: "Login successful",
-        description: `Welcome, ${user.name} ${user.surname}!`,
-      });
-      // Redirect based on role
-      if (user.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/");
+        toast({
+          title: "Login failed",
+          description: "Invalid password",
+          variant: "destructive",
+        });
+        setError("Invalid password");
       }
     } else {
       toast({
         title: "Login failed",
-        description: "Invalid employee ID or password",
+        description: "User not found",
         variant: "destructive",
       });
-      setError("Invalid employee ID or password");
+      setError("User not found");
     }
     setIsSubmitting(false);
   };

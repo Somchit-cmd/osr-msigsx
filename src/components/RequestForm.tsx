@@ -15,6 +15,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { departments, employees } from "@/data/mockData";
 import { Equipment, InventoryItem } from "@/types";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 interface RequestFormProps {
   isOpen: boolean;
@@ -42,7 +46,9 @@ export default function RequestForm({
   // Update form data when dialog opens
   useEffect(() => {
     if (isOpen) {
-      const user = JSON.parse(localStorage.getItem("user") || "null");
+      const user =
+        JSON.parse(sessionStorage.getItem("user") || "null") ||
+        JSON.parse(localStorage.getItem("user") || "null");
       setFormData({
         employeeName: user ? `${user.name} ${user.surname}` : "",
         department: user ? user.department : "",
@@ -57,6 +63,34 @@ export default function RequestForm({
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleRequestSubmit = async (formData: any) => {
+    try {
+      const user =
+        JSON.parse(sessionStorage.getItem("user") || "null") ||
+        JSON.parse(localStorage.getItem("user") || "null");
+      await addDoc(collection(db, "requests"), {
+        ...formData,
+        equipmentId: equipment.id,
+        equipmentName: equipment.name,
+        employeeId: user.id,
+        employeeName: user.name + " " + user.surname,
+        department: user.department,
+        status: "pending",
+        createdAt: Timestamp.now(),
+      });
+      toast({
+        title: "Request submitted successfully",
+        description: `Your request for ${formData.quantity} ${formData.equipmentName}(s) is being processed.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error submitting request",
+        description: "There was a problem submitting your request. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -79,9 +113,10 @@ export default function RequestForm({
       equipmentName: equipment.name,
     });
     
-    toast({
-      title: "Request submitted",
-      description: `Your request for ${equipment.name} has been submitted successfully.`,
+    handleRequestSubmit({
+      ...formData,
+      equipmentId: equipment.id,
+      equipmentName: equipment.name,
     });
     
     onClose();

@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -10,7 +16,11 @@ type AddCategoryDialogProps = {
   onAddCategory: (category: string) => void;
 };
 
-export default function AddCategoryDialog({ open, onOpenChange, onAddCategory }: AddCategoryDialogProps) {
+export default function AddCategoryDialog({
+  open,
+  onOpenChange,
+  onAddCategory,
+}: AddCategoryDialogProps) {
   const [category, setCategory] = useState("");
 
   useEffect(() => {
@@ -19,33 +29,42 @@ export default function AddCategoryDialog({ open, onOpenChange, onAddCategory }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Add Category</DialogTitle>
         </DialogHeader>
         <form
-          onSubmit={e => {
+          className="space-y-2"
+          onSubmit={(e) => {
             e.preventDefault();
             onAddCategory(category);
             onOpenChange(false);
           }}
         >
-          <Label htmlFor="category-name" className="mb-4">Category Name</Label>
-          <Input
-            id="category-name"
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            required
-            className="mb-6"
-          />
-          <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={!category}>
-              Add Category
-            </Button>
-          </DialogFooter>
+          <div className="space-y-4">
+            <Label htmlFor="category-name" className="mb-2">
+              Category Name
+            </Label>
+            <Input
+              id="category-name"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+              className="mb-4"
+            />
+            <DialogFooter>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={!category}>
+                Add Category
+              </Button>
+            </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

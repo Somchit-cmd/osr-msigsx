@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { equipments } from "@/data/mockData";
-import { Equipment } from "@/types";
+import { InventoryItem } from "@/types";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EquipmentCard from "@/components/EquipmentCard";
@@ -11,14 +10,17 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import categoriesData from "@/data/categories.json";
 import { useNavigate } from "react-router-dom";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All Items");
-  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
+  const [selectedEquipment, setSelectedEquipment] = useState<InventoryItem | null>(null);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
   const [categories, setCategories] = useState(categoriesData);
+  const [equipments, setEquipments] = useState<InventoryItem[]>([]);
   const navigate = useNavigate();
   const user =
     JSON.parse(sessionStorage.getItem("user") || "null") ||
@@ -30,12 +32,24 @@ const Index = () => {
     }
   }, [user, navigate]);
 
-  // Read categories from localStorage on mount
+  // Fetch equipment from Firebase
   useEffect(() => {
-    const localCategories = localStorage.getItem("categories");
-    if (localCategories) {
-      setCategories(JSON.parse(localCategories));
-    }
+    const fetchEquipments = async () => {
+      const snap = await getDocs(collection(db, "inventory"));
+      setEquipments(
+        snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem))
+      );
+    };
+    fetchEquipments();
+  }, []);
+
+  // Fetch categories from Firebase
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const snap = await getDocs(collection(db, "categories"));
+      setCategories(snap.docs.map(doc => doc.data().name)); // Adjust as needed
+    };
+    fetchCategories();
   }, []);
 
   // Filter equipment by category and search query
@@ -81,7 +95,7 @@ const Index = () => {
             onCategoryChange={setActiveCategory}
           />
           
-          <div className="relative w-full md:w-64">
+          <div className="relative w-full max-w-xs md:w-64 self-start">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search supplies..."

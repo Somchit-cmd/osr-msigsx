@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { FilterParams } from "@/types";
 import { subscribeToDepartments } from "@/lib/departmentService";
+import { doc, updateDoc, Timestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const AdminRequests = () => {
   const { toast } = useToast();
@@ -54,14 +56,17 @@ const AdminRequests = () => {
   const rejectedCount = requests.filter(req => req.status === "rejected").length;
   const fulfilledCount = requests.filter(req => req.status === "fulfilled").length;
   
-  const handleAction = (id: string, action: 'approve' | 'reject' | 'fulfill') => {
+  const handleAction = async (id: string, action: 'approve' | 'reject' | 'fulfill') => {
+    let update: any = { status: action };
+    if (action === "approve") update.approvedAt = Timestamp.now();
+    if (action === "fulfill") update.fulfilledAt = Timestamp.now();
+
+    await updateDoc(doc(db, "requests", id), update);
+
     toast({
-      title: `Request ${action}ed`,
-      description: `Request #${id} has been ${action}ed successfully.`,
+      title: `Request ${action}d`,
+      description: `Request #${id} has been ${action}d successfully.`,
     });
-    
-    // In a real app, we would update the request in the database
-    // and then refresh the data
   };
   
   const handleFilterChange = (key: keyof FilterParams, value: string) => {

@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 
 interface StatCardProps {
@@ -8,6 +7,7 @@ interface StatCardProps {
   trend?: {
     value: string | number;
     positive: boolean;
+    label?: string;
   };
   className?: string;
 }
@@ -26,7 +26,9 @@ export default function StatCard({ title, value, icon, trend, className = "" }: 
                 <span className={trend.positive ? "text-green-600" : "text-red-600"}>
                   {trend.positive ? "↑" : "↓"} {trend.value}
                 </span>
-                <span className="text-text-muted ml-1">from last week</span>
+                <span className="text-text-muted ml-1">
+                  {trend?.label ? trend.label : "from last week"}
+                </span>
               </div>
             )}
           </div>

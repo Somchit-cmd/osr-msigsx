@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EquipmentRequest, RequestStatus } from "@/types";
 import { formatDate, getStatusBadgeClass, capitalizeFirstLetter } from "@/utils/helpers";
+import { doc, updateDoc, Timestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useToast } from "@/hooks/use-toast";
 
 interface RequestTableProps {
   requests: EquipmentRequest[];
@@ -20,10 +23,38 @@ interface RequestTableProps {
 
 export default function RequestTable({ requests, isAdmin = false, onAction }: RequestTableProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  const statusMap = {
+    approve: "approved",
+    reject: "rejected",
+    fulfill: "fulfilled"
+  };
+
+  const handleAction = async (id: string, action: 'approve' | 'reject' | 'fulfill') => {
+    let update: any = { status: statusMap[action] };
+    if (action === "approve") update.approvedAt = Timestamp.now();
+    if (action === "fulfill") update.fulfilledAt = Timestamp.now();
+
+    await updateDoc(doc(db, "requests", id), update);
+
+    toast({
+      title: `Request ${statusMap[action]}`,
+      description: `Request #${id} has been ${statusMap[action]} successfully.`,
+    });
+
+    // Add this: re-fetch requests
+    if (typeof window !== "undefined" && window.location) {
+      window.location.reload(); // Quick fix: reloads the page
+    }
+    // Or, better: call your fetch function to update the requests state
+  };
+
+  const actionHandler = onAction || handleAction; // fallback to local if not provided
 
   return (
     <div className="rounded-md border bg-white overflow-hidden">
@@ -35,6 +66,8 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
             {isAdmin && <TableHead className="bg-gray-100 font-bold">Department</TableHead>}
             <TableHead className="text-center bg-gray-100 font-bold">Quantity</TableHead>
             <TableHead className="text-center bg-gray-100 font-bold">Request Date</TableHead>
+            <TableHead className="text-center bg-gray-100 font-bold">Approve Date</TableHead>
+            <TableHead className="text-center bg-gray-100 font-bold">Fulfilled Date</TableHead>
             <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
             <TableHead className="text-right bg-gray-100 font-bold">Actions</TableHead>
           </TableRow>
@@ -56,6 +89,20 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                   <TableCell className="text-center">{request.quantity}</TableCell>
                   <TableCell className="text-center">{formatDate(request.createdAt)}</TableCell>
                   <TableCell className="text-center">
+                    {request.approvedAt
+                      ? (request.approvedAt.toDate
+                          ? request.approvedAt.toDate().toLocaleString()
+                          : new Date(request.approvedAt).toLocaleString())
+                      : "-"}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {request.fulfilledAt
+                      ? (request.fulfilledAt.toDate
+                          ? request.fulfilledAt.toDate().toLocaleString()
+                          : new Date(request.fulfilledAt).toLocaleString())
+                      : "-"}
+                  </TableCell>
+                  <TableCell className="text-center">
                     <Badge variant="outline" className={`${getStatusBadgeClass(request.status)}`}>
                       {capitalizeFirstLetter(request.status)}
                     </Badge>
@@ -75,7 +122,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => onAction?.(request.id, "approve")}
+                            onClick={() => actionHandler(request.id, "approve")}
                             className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
                           >
                             Approve
@@ -83,7 +130,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                           <Button
                             variant="outline"
                             size="sm" 
-                            onClick={() => onAction?.(request.id, "reject")}
+                            onClick={() => actionHandler(request.id, "reject")}
                             className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
                           >
                             Reject
@@ -95,10 +142,10 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => onAction?.(request.id, "fulfill")}
-                          className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
+                          onClick={() => actionHandler(request.id, "fulfill")}
+                          className="bg-blue-100 text-blue-700 hover:bg-blue-200 ml-2"
                         >
-                          Mark Fulfilled
+                          Fulfill
                         </Button>
                       )}
                     </div>

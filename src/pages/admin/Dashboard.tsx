@@ -11,11 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  equipmentRequests,
-  getDashboardStats,
-  inventoryItems,
-} from "@/data/mockData";
 import { Progress } from "@/components/ui/progress";
 import {
   ArrowUpRight,
@@ -26,15 +21,125 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { subscribeToInventory } from "@/lib/inventoryService";
+import { subscribeToAllRequests } from "@/lib/requestService";
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, Timestamp } from "firebase/firestore";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
-  const stats = getDashboardStats();
+  const [stats, setStats] = useState({
+    requestsToday: 0,
+    requestsThisWeek: 0,
+    pendingRequests: 0,
+    lowStockItems: 0,
+  });
   const [inventoryItems, setInventoryItems] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [trend, setTrend] = useState({
+    requestsToday: { value: "+0%", positive: true, label: "from yesterday" },
+    requestsThisWeek: { value: "+0%", positive: true },
+    // ...other trends
+  });
+
+  useEffect(() => {
+    const fetchStatsAndTrends = async () => {
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const startOfYesterday = new Date(startOfToday);
+      startOfYesterday.setDate(startOfToday.getDate() - 1);
+
+      // Requests Today
+      const qToday = query(
+        collection(db, "requests"),
+        where("createdAt", ">=", Timestamp.fromDate(startOfToday))
+      );
+      const todaySnap = await getDocs(qToday);
+
+      // Requests Yesterday
+      const qYesterday = query(
+        collection(db, "requests"),
+        where("createdAt", ">=", Timestamp.fromDate(startOfYesterday)),
+        where("createdAt", "<", Timestamp.fromDate(startOfToday))
+      );
+      const yesterdaySnap = await getDocs(qYesterday);
+
+      // Calculate trend
+      const todayCount = todaySnap.size;
+      const yesterdayCount = yesterdaySnap.size;
+      let percent = 0;
+      let positive = true;
+      if (yesterdayCount === 0) {
+        percent = todayCount > 0 ? 100 : 0;
+        positive = todayCount > 0;
+      } else {
+        percent = ((todayCount - yesterdayCount) / yesterdayCount) * 100;
+        positive = percent >= 0;
+      }
+      setStats((prev) => ({
+        ...prev,
+        requestsToday: todayCount,
+      }));
+      setTrend((prev) => ({
+        ...prev,
+        requestsToday: {
+          value: `${percent > 0 ? "+" : ""}${percent.toFixed(0)}%`,
+          positive,
+          label: "from yesterday",
+        },
+      }));
+    };
+
+    fetchStatsAndTrends();
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+
+      const qToday = query(
+        collection(db, "requests"),
+        where("createdAt", ">=", Timestamp.fromDate(startOfToday))
+      );
+      const todaySnap = await getDocs(qToday);
+
+      const qWeek = query(
+        collection(db, "requests"),
+        where("createdAt", ">=", Timestamp.fromDate(startOfWeek))
+      );
+      const weekSnap = await getDocs(qWeek);
+
+      const qPending = query(
+        collection(db, "requests"),
+        where("status", "==", "pending")
+      );
+      const pendingSnap = await getDocs(qPending);
+
+      const inventorySnap = await getDocs(collection(db, "inventory"));
+      const lowStock = inventorySnap.docs.filter(
+        (doc) => doc.data().available <= doc.data().minQuantity
+      );
+
+      setStats({
+        requestsToday: todaySnap.size,
+        requestsThisWeek: weekSnap.size,
+        pendingRequests: pendingSnap.size,
+        lowStockItems: lowStock.length,
+      });
+    };
+
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = subscribeToInventory(setInventoryItems);
-    return () => unsubscribe();
+    const unsubscribeRequests = subscribeToAllRequests(setRequests);
+    return () => {
+      unsubscribe();
+      unsubscribeRequests();
+    };
   }, []);
 
   const lowStockItems = inventoryItems
@@ -42,7 +147,7 @@ const AdminDashboard = () => {
     .slice(0, 5);
 
   // Get only pending requests
-  const pendingRequests = equipmentRequests
+  const pendingRequests = requests
     .filter((request) => request.status === "pending")
     .slice(0, 5); // Only show 5 most recent
 
@@ -70,13 +175,13 @@ const AdminDashboard = () => {
           <StatCard
             title="Requests Today"
             value={stats.requestsToday}
-            trend={{ value: "+25%", positive: true }}
+            trend={trend.requestsToday}
             icon={<ClipboardList size={24} />}
           />
           <StatCard
             title="Requests This Week"
             value={stats.requestsThisWeek}
-            trend={{ value: "+12%", positive: true }}
+            trend={trend.requestsThisWeek}
             icon={<ArrowUpRight size={24} />}
           />
           <StatCard
@@ -141,11 +246,6 @@ const AdminDashboard = () => {
                 isAdmin={true}
                 onAction={handleAction}
               />
-              {pendingRequests.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  No pending requests available
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
