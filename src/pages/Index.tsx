@@ -80,7 +80,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header user={user} />
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">

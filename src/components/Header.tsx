@@ -8,9 +8,10 @@ import { useState } from "react";
 
 interface HeaderProps {
   userRole?: string;
+  user?: any; // Ideally, type this properly
 }
 
-export default function Header({ userRole = "employee" }: HeaderProps) {
+export default function Header({ userRole = "employee", user }: HeaderProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = userRole === "admin" || userRole === "supervisor";
@@ -53,6 +54,12 @@ export default function Header({ userRole = "employee" }: HeaderProps) {
                 <ClipboardList className="w-4 h-4 mr-1" />
                 My Requests
               </Link>
+              {user && (
+                <div className="flex items-center space-x-2 bg-brand-blue/70 px-3 py-1 rounded">
+                  <User className="w-5 h-5" />
+                  <span className="font-medium">{user.name} {user.surname}</span>
+                </div>
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -62,6 +69,7 @@ export default function Header({ userRole = "employee" }: HeaderProps) {
                 <LogOut className="w-4 h-4 mr-1" />
                 Logout
               </Button>
+              
             </>
           ) : (
             <>
@@ -108,6 +116,12 @@ export default function Header({ userRole = "employee" }: HeaderProps) {
                 <LogOut className="w-4 h-4 mr-1" />
                 Logout
               </Button>
+              {user && (
+                <div className="flex items-center space-x-2 bg-brand-blue/70 px-3 py-1 rounded">
+                  <User className="w-5 h-5" />
+                  <span className="font-medium">{user.name} {user.surname}</span>
+                </div>
+              )}
             </>
           )}
         </div>
