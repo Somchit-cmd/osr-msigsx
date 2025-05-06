@@ -1,6 +1,5 @@
-
-import { useState } from "react";
-import { equipmentRequests } from "@/data/mockData";
+import { useEffect, useState } from "react";
+import { subscribeToAllRequests } from "@/lib/requestService";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequestTable from "@/components/RequestTable";
@@ -11,15 +10,28 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { FilterParams } from "@/types";
+import { subscribeToDepartments } from "@/lib/departmentService";
 
 const AdminRequests = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<FilterParams>({});
+  const [requests, setRequests] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  
+  useEffect(() => {
+    const unsubscribe = subscribeToAllRequests(setRequests);
+    return () => unsubscribe();
+  }, []);
+  
+  useEffect(() => {
+    const unsubscribe = subscribeToDepartments(setDepartments);
+    return () => unsubscribe();
+  }, []);
   
   // Filter requests based on the active tab, search query, and filters
-  const filteredRequests = equipmentRequests.filter(request => {
+  const filteredRequests = requests.filter(request => {
     // Filter by status tab
     const matchesStatus = activeTab === "all" || request.status === activeTab;
     
@@ -36,14 +48,11 @@ const AdminRequests = () => {
   });
   
   // Get counts for tabs
-  const allCount = equipmentRequests.length;
-  const pendingCount = equipmentRequests.filter(req => req.status === "pending").length;
-  const approvedCount = equipmentRequests.filter(req => req.status === "approved").length;
-  const rejectedCount = equipmentRequests.filter(req => req.status === "rejected").length;
-  const fulfilledCount = equipmentRequests.filter(req => req.status === "fulfilled").length;
-  
-  // Get unique departments for filtering
-  const departments = [...new Set(equipmentRequests.map(req => req.department))];
+  const allCount = requests.length;
+  const pendingCount = requests.filter(req => req.status === "pending").length;
+  const approvedCount = requests.filter(req => req.status === "approved").length;
+  const rejectedCount = requests.filter(req => req.status === "rejected").length;
+  const fulfilledCount = requests.filter(req => req.status === "fulfilled").length;
   
   const handleAction = (id: string, action: 'approve' | 'reject' | 'fulfill') => {
     toast({
@@ -116,7 +125,7 @@ const AdminRequests = () => {
                 <SelectContent>
                   <SelectItem value="all">All Departments</SelectItem>
                   {departments.map(dept => (
-                    <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                    <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -133,12 +142,6 @@ const AdminRequests = () => {
               isAdmin={true}
               onAction={handleAction}
             />
-            
-            {filteredRequests.length === 0 && (
-              <div className="text-center py-12 bg-white border rounded-md">
-                <p className="text-lg text-text-muted">No requests found matching your criteria.</p>
-              </div>
-            )}
           </TabsContent>
         </Tabs>
       </main>

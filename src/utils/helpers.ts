@@ -1,12 +1,13 @@
-
 import { FilterParams, RequestStatus } from "@/types";
 
-export function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+export function formatDate(date: any) {
+  if (!date) return "";
+  // Firestore Timestamp object
+  if (typeof date.toDate === "function") {
+    return date.toDate().toLocaleString(); // or .toLocaleDateString() for just the date
+  }
+  // ISO string or Date object
+  return new Date(date).toLocaleString();
 }
 
 export function getStatusBadgeClass(status: RequestStatus): string {

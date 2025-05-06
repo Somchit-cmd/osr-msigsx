@@ -21,6 +21,10 @@ export type EquipmentRequest = {
   approvalDate?: string;
   fulfillmentDate?: string;
   adminNotes?: string;
+  createdAt: any;
+  updatedAt: any;
+  approvedAt?: any;
+  fulfilledAt?: any;
 };
 
 export type Department = {

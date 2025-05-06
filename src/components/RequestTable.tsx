@@ -54,7 +54,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                   {isAdmin && <TableCell>{request.employeeName}</TableCell>}
                   {isAdmin && <TableCell>{request.department}</TableCell>}
                   <TableCell className="text-center">{request.quantity}</TableCell>
-                  <TableCell className="text-center">{formatDate(request.requestDate)}</TableCell>
+                  <TableCell className="text-center">{formatDate(request.createdAt)}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline" className={`${getStatusBadgeClass(request.status)}`}>
                       {capitalizeFirstLetter(request.status)}
@@ -123,7 +123,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <span className="font-medium">Request Date:</span>{" "}
-                            {formatDate(request.requestDate)}
+                            {formatDate(request.createdAt)}
                           </div>
                           
                           {request.approvalDate && (

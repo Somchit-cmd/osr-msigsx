@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StatCard from "@/components/StatCard";
@@ -25,20 +25,26 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { subscribeToInventory } from "@/lib/inventoryService";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
   const stats = getDashboardStats();
+  const [inventoryItems, setInventoryItems] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToInventory(setInventoryItems);
+    return () => unsubscribe();
+  }, []);
+
+  const lowStockItems = inventoryItems
+    .filter((item) => item.available <= item.minQuantity)
+    .slice(0, 5);
 
   // Get only pending requests
   const pendingRequests = equipmentRequests
     .filter((request) => request.status === "pending")
     .slice(0, 5); // Only show 5 most recent
-
-  // Get low stock items
-  const lowStockItems = inventoryItems
-    .filter((item) => item.available <= item.lowStockThreshold)
-    .slice(0, 5);
 
   const handleAction = (
     id: string,

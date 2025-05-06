@@ -14,12 +14,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { departments, employees } from "@/data/mockData";
-import { Equipment } from "@/types";
+import { Equipment, InventoryItem } from "@/types";
 
 interface RequestFormProps {
   isOpen: boolean;
   onClose: () => void;
-  equipment: Equipment | null;
+  equipment: InventoryItem | null;
   onSubmit: (formData: any) => void;
 }
 
