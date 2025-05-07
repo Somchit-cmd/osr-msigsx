@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import usersData from "@/data/users.json";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import categoriesData from "@/data/categories.json";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import AddUserDialog from "@/components/AddUserDialog";
 import EditUserDialog from "@/components/EditUserDialog";
 import RemoveUserDialog from "@/components/RemoveUserDialog";

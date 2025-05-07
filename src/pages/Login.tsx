@@ -13,9 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import users from "@/data/users.json";
 import logo from "@/assets/logo-png-only.webp";
-import { authenticate } from "@/lib/authService";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 

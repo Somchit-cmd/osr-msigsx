@@ -8,7 +8,6 @@ import RequestForm from "@/components/RequestForm";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import categoriesData from "@/data/categories.json";
 import { useNavigate } from "react-router-dom";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, onSnapshot } from "firebase/firestore";
@@ -19,7 +18,7 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState("All Items");
   const [selectedEquipment, setSelectedEquipment] = useState<InventoryItem | null>(null);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
-  const [categories, setCategories] = useState(categoriesData);
+  const [categories, setCategories] = useState([]);
   const [equipments, setEquipments] = useState<InventoryItem[]>([]);
   const navigate = useNavigate();
   const [user, setUser] = useState(() =>
