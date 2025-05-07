@@ -11,7 +11,7 @@ import { Search } from "lucide-react";
 import categoriesData from "@/data/categories.json";
 import { useNavigate } from "react-router-dom";
 import { db } from "@/lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 
 const Index = () => {
   const { toast } = useToast();
@@ -46,13 +46,12 @@ const Index = () => {
 
   // Fetch equipment from Firebase
   useEffect(() => {
-    const fetchEquipments = async () => {
-      const snap = await getDocs(collection(db, "inventory"));
+    const unsubscribe = onSnapshot(collection(db, "inventory"), (snap) => {
       setEquipments(
         snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem))
       );
-    };
-    fetchEquipments();
+    });
+    return () => unsubscribe();
   }, []);
 
   // Fetch categories from Firebase

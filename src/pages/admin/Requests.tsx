@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { FilterParams } from "@/types";
 import { subscribeToDepartments } from "@/lib/departmentService";
-import { doc, updateDoc, Timestamp } from "firebase/firestore";
+import { doc, updateDoc, Timestamp, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Pagination from "@/components/Pagination";
 
@@ -81,7 +81,29 @@ const AdminRequests = () => {
     if (action === "approve") update.approvedAt = Timestamp.now();
     if (action === "fulfill") update.fulfilledAt = Timestamp.now();
 
-    await updateDoc(doc(db, "requests", id), update);
+    // 1. Get the request document to find the equipment/item id and quantity
+    const requestRef = doc(db, "requests", id);
+    const requestSnap = await getDoc(requestRef);
+    const requestData = requestSnap.data();
+
+    // 2. If approving or fulfilling, decrease the inventory
+    if (action === "fulfill" && requestData) {
+      const equipmentId = requestData.equipmentId;
+      const quantityRequested = requestData.quantity;
+
+      if (equipmentId && quantityRequested) {
+        const equipmentRef = doc(db, "inventory", equipmentId);
+        const equipmentSnap = await getDoc(equipmentRef);
+        const equipmentData = equipmentSnap.data();
+        if (equipmentData) {
+          const newAvailable = (equipmentData.available || 0) - quantityRequested;
+          await updateDoc(equipmentRef, { available: newAvailable });
+        }
+      }
+    }
+
+    // 3. Update the request status as before
+    await updateDoc(requestRef, update);
 
     toast({
       title: `Request ${statusMap[action]}`,

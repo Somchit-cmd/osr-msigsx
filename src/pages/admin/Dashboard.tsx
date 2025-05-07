@@ -201,7 +201,7 @@ const AdminDashboard = () => {
             icon={<Clock size={24} />}
           />
           <StatCard
-            title="Low Stock Items"
+            title="Low Stock / Out of Stock Items"
             value={stats.lowStockItems}
             icon={<AlertTriangle size={24} />}
             className={
