@@ -20,6 +20,8 @@ export function getStatusBadgeClass(status: RequestStatus): string {
       return 'badge-danger';
     case 'fulfilled':
       return 'bg-blue-100 text-blue-800';
+    case 'cancelled':
+      return 'bg-gray-200 text-gray-600';
     default:
       return '';
   }

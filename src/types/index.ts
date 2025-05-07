@@ -6,7 +6,7 @@ export type Equipment = {
   image: string;
 };
 
-export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'fulfilled';
+export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'fulfilled' | 'cancelled';
 
 export type EquipmentRequest = {
   id: string;
