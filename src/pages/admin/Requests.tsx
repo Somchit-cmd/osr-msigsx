@@ -13,6 +13,9 @@ import { FilterParams } from "@/types";
 import { subscribeToDepartments } from "@/lib/departmentService";
 import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Pagination from "@/components/Pagination";
+
+const PAGE_SIZE = 10;
 
 const AdminRequests = () => {
   const { toast } = useToast();
@@ -21,6 +24,7 @@ const AdminRequests = () => {
   const [filters, setFilters] = useState<FilterParams>({});
   const [requests, setRequests] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   
   useEffect(() => {
     const unsubscribe = subscribeToAllRequests(setRequests);
@@ -55,6 +59,17 @@ const AdminRequests = () => {
   const approvedCount = requests.filter(req => req.status === "approved").length;
   const rejectedCount = requests.filter(req => req.status === "rejected").length;
   const fulfilledCount = requests.filter(req => req.status === "fulfilled").length;
+  
+  const totalPages = Math.ceil(filteredRequests.length / PAGE_SIZE);
+  const paginatedRequests = filteredRequests.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+  
+  // Reset to page 1 when filters or tab change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery, filters, requests]);
   
   const handleAction = async (id: string, action: 'approve' | 'reject' | 'fulfill') => {
     const statusMap = {
@@ -148,9 +163,14 @@ const AdminRequests = () => {
           
           <TabsContent value={activeTab}>
             <RequestTable 
-              requests={filteredRequests} 
+              requests={paginatedRequests} 
               isAdmin={true}
               onAction={handleAction}
+            />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
             />
           </TabsContent>
         </Tabs>

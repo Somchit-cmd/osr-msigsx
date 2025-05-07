@@ -4,6 +4,9 @@ import Footer from "@/components/Footer";
 import RequestTable from "@/components/RequestTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { subscribeToUserRequests } from "@/lib/requestService";
+import Pagination from "@/components/Pagination";
+
+const PAGE_SIZE = 10;
 
 const MyRequests = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -12,6 +15,7 @@ const MyRequests = () => {
     JSON.parse(sessionStorage.getItem("user") || "null") ||
     JSON.parse(localStorage.getItem("user") || "null")
   );
+  const [currentPage, setCurrentPage] = useState(1);
   
   // Use myRequests from Firestore for filtering and counts
   const filteredRequests = activeTab === "all"
@@ -22,6 +26,18 @@ const MyRequests = () => {
   const approvedCount = myRequests.filter(req => req.status === "approved").length;
   const rejectedCount = myRequests.filter(req => req.status === "rejected").length;
   const fulfilledCount = myRequests.filter(req => req.status === "fulfilled").length;
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredRequests.length / PAGE_SIZE);
+  const paginatedRequests = filteredRequests.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, myRequests]);
 
   useEffect(() => {
     console.log("Current user object:", user); // Debug log for full user object
@@ -85,7 +101,12 @@ const MyRequests = () => {
           </TabsList>
           
           <TabsContent value={activeTab}>
-            <RequestTable requests={filteredRequests} />
+            <RequestTable requests={paginatedRequests} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </TabsContent>
         </Tabs>
       </main>
