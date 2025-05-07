@@ -1,79 +1,225 @@
-import { useState } from "react";
-import { equipmentRequests } from "@/data/mockData";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Download, Filter, BarChart, PieChart } from "lucide-react";
+import { Download, Filter, PieChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getStatusBadgeClass, formatDate } from "@/utils/helpers";
-import { departments } from "@/data/mockData";
+import { subscribeToAllRequests } from "@/lib/requestService";
+import { subscribeToDepartments } from "@/lib/departmentService";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import Pagination from "@/components/Pagination";
+import { PieChart as RePieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart as ReBarChart, Bar, XAxis, YAxis } from 'recharts';
+import Papa from "papaparse";
+
+const PAGE_SIZE = 10;
 
 const AdminReports = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("daily");
   const [startDate, setStartDate] = useState(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
   );
   const [endDate, setEndDate] = useState(
-    new Date().toISOString().split('T')[0]
+    new Date().toISOString().split("T")[0]
   );
   const [department, setDepartment] = useState("all");
-  
+  const [requests, setRequests] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Subscribe to real-time updates from Firebase
+  useEffect(() => {
+    const unsubscribe = subscribeToAllRequests(setRequests);
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToDepartments(setDepartments);
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "daily") {
+      const today = new Date();
+      setStartDate(today.toISOString().split("T")[0]);
+      setEndDate(today.toISOString().split("T")[0]);
+    } else if (activeTab === "weekly") {
+      const today = new Date();
+      const firstDayOfWeek = new Date(today);
+      firstDayOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+      setStartDate(firstDayOfWeek.toISOString().split("T")[0]);
+      setEndDate(today.toISOString().split("T")[0]);
+    } else if (activeTab === "monthly") {
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      setStartDate(firstDayOfMonth.toISOString().split("T")[0]);
+      setEndDate(today.toISOString().split("T")[0]);
+    }
+    // For "custom", do not change the dates
+  }, [activeTab]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, startDate, endDate, department, requests]);
+
+  function getReportFileName() {
+    if (activeTab === "daily") {
+      return `equipment-requests-daily-${startDate}.csv`;
+    }
+    if (activeTab === "weekly") {
+      return `equipment-requests-weekly-${startDate}_to_${endDate}.csv`;
+    }
+    if (activeTab === "monthly") {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      return `equipment-requests-monthly-${year}-${month}.csv`;
+    }
+    // Custom
+    return `equipment-requests-custom-${startDate}_to_${endDate}.csv`;
+  }
+
   // Function to generate report data for exports
   const generateReport = () => {
+    if (filteredRequests.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no requests for the selected filters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Prepare data for CSV
+    const csvData = filteredRequests.map(req => ({
+      "Request Date": formatDate(req.createdAt?.toDate?.() || req.createdAt),
+      "Employee": req.employeeName,
+      "Department": req.department,
+      "Equipment": req.equipmentName,
+      "Quantity": req.quantity,
+      "Notes": req.notes || "",
+      "Status": req.status,
+      "Approval Date": req.approvedAt ? formatDate(req.approvedAt?.toDate?.() || req.approvedAt) : "",
+      "Fulfillment Date": req.fulfilledAt ? formatDate(req.fulfilledAt?.toDate?.() || req.fulfilledAt) : "",
+      "Admin Notes": req.adminNotes || "",
+    }));
+
+    const csv = Papa.unparse(csvData);
+
+    // Download CSV
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", getReportFileName());
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     toast({
-      title: "Report generated",
+      title: "Report exported",
       description: `Report for ${activeTab} activity has been exported successfully.`,
     });
   };
-  
+
   // Filter requests based on date range and department
-  const filteredRequests = equipmentRequests.filter(request => {
-    const requestDate = new Date(request.requestDate);
-    const filterStartDate = startDate ? new Date(startDate) : new Date(0);
-    const filterEndDate = endDate ? new Date(endDate) : new Date();
-    
-    const matchesDateRange = 
-      requestDate >= filterStartDate && 
-      requestDate <= filterEndDate;
-    
-    const matchesDepartment = 
+  const filteredRequests = requests.filter((request) => {
+    // Convert Firestore Timestamp to Date
+    const requestDate = request.createdAt.toDate();
+
+    // Parse start and end dates, and set time to cover the full day
+    const filterStartDate = startDate
+      ? new Date(`${startDate}T00:00:00`)
+      : new Date(0);
+    const filterEndDate = endDate
+      ? new Date(`${endDate}T23:59:59`)
+      : new Date();
+
+    const matchesDateRange =
+      requestDate >= filterStartDate && requestDate <= filterEndDate;
+
+    const matchesDepartment =
       department === "all" || request.department === department;
-    
+
     return matchesDateRange && matchesDepartment;
   });
-  
+
   // Calculate statistics
   const totalRequests = filteredRequests.length;
-  const approvedRequests = filteredRequests.filter(r => r.status === 'approved' || r.status === 'fulfilled').length;
-  const rejectedRequests = filteredRequests.filter(r => r.status === 'rejected').length;
-  const pendingRequests = filteredRequests.filter(r => r.status === 'pending').length;
-  
+  const approvedOnly = filteredRequests.filter(r => r.status === "approved").length;
+  const pendingOnly = filteredRequests.filter(r => r.status === "pending").length;
+  const rejectedOnly = filteredRequests.filter(r => r.status === "rejected").length;
+  const fulfilledOnly = filteredRequests.filter(r => r.status === "fulfilled").length;
+
   // Generate data for charts
-  const departmentData = departments.map(dept => {
-    const count = filteredRequests.filter(r => r.department === dept.name).length;
-    return { name: dept.name, value: count };
-  }).filter(d => d.value > 0);
-  
+  const departmentData = departments
+    .map((dept) => {
+      const count = filteredRequests.filter(
+        (r) => r.department === dept.name
+      ).length;
+      return { name: dept.name, value: count };
+    })
+    .filter((d) => d.value > 0);
+
+  const statusDataRaw = [
+    { name: "Approved", value: approvedOnly },
+    { name: "Pending", value: pendingOnly },
+    { name: "Rejected", value: rejectedOnly },
+    { name: "Fulfilled", value: fulfilledOnly },
+  ];
+
+  // Only include statuses with value > 0
+  const statusData = statusDataRaw.filter(d => d.value > 0);
+
+  const totalPages = Math.ceil(filteredRequests.length / PAGE_SIZE);
+  const paginatedRequests = filteredRequests.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header userRole="admin" />
-      
+
       <main className="flex-1 container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-2">Reports & Analytics</h1>
-        <p className="text-text-muted mb-8">Generate and export equipment disbursement reports</p>
-        
+        <p className="text-text-muted mb-8">
+          Generate and export equipment disbursement reports
+        </p>
+
         <div className="bg-white rounded-lg border p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-            <Tabs 
-              defaultValue="daily" 
-              value={activeTab} 
+            <Tabs
+              defaultValue="daily"
+              value={activeTab}
               onValueChange={setActiveTab}
               className="flex-1"
             >
@@ -84,38 +230,40 @@ const AdminReports = () => {
                 <TabsTrigger value="custom">Custom</TabsTrigger>
               </TabsList>
             </Tabs>
-            
-            <Button 
+
+            <Button
               onClick={generateReport}
               className="bg-brand-blue hover:bg-brand-blue/90"
             >
               <Download className="h-4 w-4 mr-2" /> Export Report
             </Button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-1">
-                Start Date
-              </label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-1">
-                End Date
-              </label>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={e => setEndDate(e.target.value)}
-              />
-            </div>
-            
+            {activeTab === "custom" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-text-muted mb-1">
+                    Start Date
+                  </label>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-muted mb-1">
+                    End Date
+                  </label>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
             <div>
               <label className="block text-sm font-medium text-text-muted mb-1">
                 Department
@@ -126,20 +274,16 @@ const AdminReports = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Departments</SelectItem>
-                  {departments.map(dept => (
-                    <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept.id} value={dept.name}>
+                      {dept.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="flex items-end">
-              <Button variant="outline" className="w-full">
-                <Filter className="h-4 w-4 mr-2" /> Apply Filters
-              </Button>
-            </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <Card>
               <CardContent className="p-6">
@@ -147,124 +291,226 @@ const AdminReports = () => {
                 <div className="text-sm text-text-muted">Total Requests</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
-                <div className="text-4xl font-bold mb-1 text-green-600">{approvedRequests}</div>
-                <div className="text-sm text-text-muted">Approved/Fulfilled</div>
+                <div className="text-4xl font-bold mb-1 text-green-600">
+                  {approvedOnly}
+                </div>
+                <div className="text-sm text-text-muted">
+                  Approved/Fulfilled
+                </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
-                <div className="text-4xl font-bold mb-1 text-yellow-600">{pendingRequests}</div>
+                <div className="text-4xl font-bold mb-1 text-yellow-600">
+                  {pendingOnly}
+                </div>
                 <div className="text-sm text-text-muted">Pending</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
-                <div className="text-4xl font-bold mb-1 text-red-600">{rejectedRequests}</div>
+                <div className="text-4xl font-bold mb-1 text-red-600">
+                  {rejectedOnly}
+                </div>
                 <div className="text-sm text-text-muted">Rejected</div>
               </CardContent>
             </Card>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <BarChart className="h-5 w-5 mr-2" /> Requests by Department
+                  <RePieChart className="h-5 w-5 mr-2" /> Requests by Department
                 </CardTitle>
                 <CardDescription>
                   Distribution of equipment requests by department
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-80 flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <p>Chart visualization would appear here</p>
-                  <p className="text-sm mt-2">
-                    {departmentData.map(d => `${d.name}: ${d.value}`).join(', ')}
-                  </p>
-                </div>
+                {departmentData.length === 0 ? (
+                  <div className="text-center text-gray-500">
+                    <p>No data to display</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RePieChart>
+                      <Pie
+                        data={departmentData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                      >
+                        {departmentData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={["#2563eb", "#10b981", "#f59e42", "#ef4444", "#a21caf", "#fbbf24", "#6366f1"][index % 7]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </RePieChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <PieChart className="h-5 w-5 mr-2" /> Request Status Distribution
+                  <PieChart className="h-5 w-5 mr-2" /> Request Status
+                  Distribution
                 </CardTitle>
                 <CardDescription>
                   Breakdown of requests by status
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-80 flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <p>Chart visualization would appear here</p>
-                  <p className="text-sm mt-2">
-                    Approved: {approvedRequests}, Pending: {pendingRequests}, Rejected: {rejectedRequests}
-                  </p>
-                </div>
+                {statusData.every(d => d.value === 0) ? (
+                  <div className="text-center text-gray-500">
+                    <p>No data to display</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RePieChart>
+                      <Pie
+                        data={statusData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                      >
+                        {statusData.map((entry, index) => (
+                          <Cell
+                            key={`cell-status-${index}`}
+                            fill={["#22c55e", "#fbbf24", "#ef4444", "#2563eb"][index]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </RePieChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
           </div>
-          
+
           <div>
-            <h3 className="text-lg font-semibold mb-4">Detailed Request Data</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Detailed Request Data
+            </h3>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="bg-gray-100 font-bold">Date</TableHead>
-                    <TableHead className="bg-gray-100 font-bold">Employee</TableHead>
-                    <TableHead className="bg-gray-100 font-bold">Department</TableHead>
-                    <TableHead className="bg-gray-100 font-bold">Equipment</TableHead>
-                    <TableHead className="bg-gray-100 font-bold">Quantity</TableHead>
-                    <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Request Date
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Employee
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Department
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Equipment
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Quantity
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Notes
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Status
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Approval Date
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Fulfillment Date
+                    </TableHead>
+                    <TableHead className="bg-gray-100 font-bold">
+                      Admin Notes
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredRequests.length === 0 ? (
+                  {paginatedRequests.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-10 text-gray-500">
+                      <TableCell
+                        colSpan={10}
+                        className="text-center py-10 text-gray-500"
+                      >
                         No data available for the selected filters
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredRequests.slice(0, 10).map((request) => (
+                    paginatedRequests.map((request) => (
                       <TableRow key={request.id}>
-                        <TableCell>{formatDate(request.requestDate)}</TableCell>
+                        <TableCell>
+                          {formatDate(
+                            request.createdAt?.toDate?.() || request.createdAt
+                          )}
+                        </TableCell>
                         <TableCell>{request.employeeName}</TableCell>
                         <TableCell>{request.department}</TableCell>
                         <TableCell>{request.equipmentName}</TableCell>
                         <TableCell>{request.quantity}</TableCell>
+                        <TableCell>{request.notes || "-"}</TableCell>
                         <TableCell className="text-center">
-                          <Badge 
-                            variant="outline" 
+                          <Badge
+                            variant="outline"
                             className={getStatusBadgeClass(request.status)}
                           >
-                            {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                            {request.status.charAt(0).toUpperCase() +
+                              request.status.slice(1)}
                           </Badge>
                         </TableCell>
+                        <TableCell>
+                          {request.approvedAt
+                            ? formatDate(
+                                request.approvedAt?.toDate?.() ||
+                                  request.approvedAt
+                              )
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          {request.fulfilledAt
+                            ? formatDate(
+                                request.fulfilledAt?.toDate?.() ||
+                                  request.fulfilledAt
+                              )
+                            : "-"}
+                        </TableCell>
+                        <TableCell>{request.adminNotes || "-"}</TableCell>
                       </TableRow>
                     ))
                   )}
                 </TableBody>
               </Table>
-              
-              {filteredRequests.length > 10 && (
-                <div className="p-4 text-center">
-                  <Button variant="outline" className="text-brand-blue">
-                    Load More
-                  </Button>
-                </div>
-              )}
             </div>
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}{" "}
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
