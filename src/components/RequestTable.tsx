@@ -148,6 +148,24 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                           Fulfill
                         </Button>
                       )}
+
+                      {!isAdmin && request.status === "pending" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            await updateDoc(doc(db, "requests", request.id), { status: "cancelled" });
+                            toast({
+                              title: "Request Cancelled",
+                              description: `Request #${request.id} has been cancelled.`,
+                            });
+                            window.location.reload(); // Or trigger a re-fetch of requests
+                          }}
+                          className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                        >
+                          Cancel
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

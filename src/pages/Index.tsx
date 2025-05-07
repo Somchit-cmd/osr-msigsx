@@ -22,15 +22,27 @@ const Index = () => {
   const [categories, setCategories] = useState(categoriesData);
   const [equipments, setEquipments] = useState<InventoryItem[]>([]);
   const navigate = useNavigate();
-  const user =
+  const [user, setUser] = useState(() =>
     JSON.parse(sessionStorage.getItem("user") || "null") ||
-    JSON.parse(localStorage.getItem("user") || "null");
+    JSON.parse(localStorage.getItem("user") || "null")
+  );
 
   useEffect(() => {
     if (user && user.role === "admin") {
       navigate("/admin/dashboard", { replace: true });
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setUser(
+        JSON.parse(sessionStorage.getItem("user") || "null") ||
+        JSON.parse(localStorage.getItem("user") || "null")
+      );
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   // Fetch equipment from Firebase
   useEffect(() => {

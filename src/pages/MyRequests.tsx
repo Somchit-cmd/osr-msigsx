@@ -5,13 +5,13 @@ import RequestTable from "@/components/RequestTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { subscribeToUserRequests } from "@/lib/requestService";
 
-const user =
-  JSON.parse(sessionStorage.getItem("user") || "null") ||
-  JSON.parse(localStorage.getItem("user") || "null");
-
 const MyRequests = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [myRequests, setMyRequests] = useState([]);
+  const [user, setUser] = useState(() =>
+    JSON.parse(sessionStorage.getItem("user") || "null") ||
+    JSON.parse(localStorage.getItem("user") || "null")
+  );
   
   // Use myRequests from Firestore for filtering and counts
   const filteredRequests = activeTab === "all"
@@ -57,9 +57,21 @@ const MyRequests = () => {
     console.log("Current requests state:", myRequests);
   }, [myRequests]);
 
+  useEffect(() => {
+    // Update user state if storage changes (e.g., after login/logout)
+    const handleStorage = () => {
+      setUser(
+        JSON.parse(sessionStorage.getItem("user") || "null") ||
+        JSON.parse(localStorage.getItem("user") || "null")
+      );
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header user={user} />
       <main className="flex-1 container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">My Requests</h1>
         
