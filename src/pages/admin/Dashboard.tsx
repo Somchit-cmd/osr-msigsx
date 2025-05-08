@@ -24,6 +24,7 @@ import { subscribeToInventory } from "@/lib/inventoryService";
 import { subscribeToAllRequests } from "@/lib/requestService";
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from "firebase/firestore";
+import { useFCMToken } from "@/hooks/useFCMToken"; // adjust the import path if needed
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -40,6 +41,8 @@ const AdminDashboard = () => {
     requestsThisWeek: { value: "+0%", positive: true },
     // ...other trends
   });
+
+  useFCMToken(); // Only runs for admins
 
   useEffect(() => {
     const fetchStatsAndTrends = async () => {
