@@ -94,6 +94,15 @@ export default function RequestForm({
       const docRef = await addDoc(collection(db, "requests"), requestData);
       console.log("Request created with ID:", docRef.id); // Debug log
 
+      await addDoc(collection(db, "notifications"), {
+        userId: "admin",
+        type: "new_request",
+        requestId: docRef.id,
+        message: `New request #${docRef.id} submitted by ${user.name} ${user.surname}.`,
+        read: false,
+        createdAt: Timestamp.now()
+      });
+
       toast({
         title: "Request submitted successfully",
         description: `Your request for ${formData.quantity} ${formData.equipmentName}(s) is being processed.`,

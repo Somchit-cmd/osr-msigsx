@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { FilterParams } from "@/types";
 import { subscribeToDepartments } from "@/lib/departmentService";
-import { doc, updateDoc, Timestamp, getDoc } from "firebase/firestore";
+import { doc, updateDoc, Timestamp, getDoc, addDoc, collection } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Pagination from "@/components/Pagination";
 
@@ -104,6 +104,19 @@ const AdminRequests = () => {
 
     // 3. Update the request status as before
     await updateDoc(requestRef, update);
+
+    // NEW: Add notification for the user
+    const userId = requestData.userId || requestData.employeeId;
+    if (userId) {
+      await addDoc(collection(db, "notifications"), {
+        userId,
+        type: `request_${statusMap[action]}`,
+        requestId: id,
+        message: `Your request #${id} was ${statusMap[action]}.`,
+        read: false,
+        createdAt: Timestamp.now()
+      });
+    }
 
     toast({
       title: `Request ${statusMap[action]}`,

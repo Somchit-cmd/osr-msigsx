@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-small.webp";
 import LogoutConfirmDialog from "@/components/LogoutConfirmDialog";
 import { useState } from "react";
+import NotificationBell from "@/components/NotificationBell";
 
 interface HeaderProps {
   userRole?: string;
@@ -60,6 +61,7 @@ export default function Header({ userRole = "employee", user }: HeaderProps) {
                   <span className="font-medium">{user.name} {user.surname}</span>
                 </div>
               )}
+              <NotificationBell userId={user.id} />
               <Button
                 variant="outline"
                 size="sm"
@@ -101,6 +103,7 @@ export default function Header({ userRole = "employee", user }: HeaderProps) {
                 <BarChart className="w-4 h-4 mr-1" />
                 Reports
               </Link>
+              <NotificationBell userId="admin" />
               <Button
                 variant="outline"
                 size="sm"

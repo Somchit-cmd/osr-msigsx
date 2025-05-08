@@ -145,6 +145,34 @@ const AdminDashboard = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+
+    const requestsToday = requests.filter(req => {
+      const createdAt = req.createdAt?.toDate ? req.createdAt.toDate() : req.createdAt;
+      return createdAt >= startOfToday;
+    }).length;
+
+    const requestsThisWeek = requests.filter(req => {
+      const createdAt = req.createdAt?.toDate ? req.createdAt.toDate() : req.createdAt;
+      return createdAt >= startOfWeek;
+    }).length;
+
+    const pendingRequests = requests.filter(req => req.status === "pending").length;
+
+    const lowStockItems = inventoryItems.filter(item => item.available <= item.minQuantity).length;
+
+    setStats({
+      requestsToday,
+      requestsThisWeek,
+      pendingRequests,
+      lowStockItems,
+    });
+  }, [requests, inventoryItems]);
+
   const lowStockItems = inventoryItems
     .filter((item) => item.available <= item.minQuantity)
     .slice(0, 5);
