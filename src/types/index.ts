@@ -10,6 +10,7 @@ export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'fulfilled' | 
 
 export type EquipmentRequest = {
   id: string;
+  employeeId: string;
   employeeName: string;
   department: string;
   equipmentId: string;
