@@ -11,6 +11,7 @@ import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const { toast } = useToast();
@@ -25,6 +26,7 @@ const Index = () => {
     JSON.parse(sessionStorage.getItem("user") || "null") ||
     JSON.parse(localStorage.getItem("user") || "null")
   );
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user && user.role === "admin") {
@@ -94,8 +96,8 @@ const Index = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Available Office Supplies</h1>
-          <p className="text-text-muted">Browse and request supplies for your needs</p>
+          <h1 className="text-3xl font-bold mb-2">{t('homepage.title')}</h1>
+          <p className="text-text-muted">{t('homepage.subtitle')}</p>
         </div>
         
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -108,7 +110,7 @@ const Index = () => {
           <div className="relative w-full max-w-xs md:w-64 self-start">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search supplies..."
+              placeholder={t('homepage.searchPlaceholder')}
               className="pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -118,7 +120,7 @@ const Index = () => {
         
         {filteredEquipment.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-lg text-text-muted">No supplies found matching your criteria.</p>
+            <p className="text-lg text-text-muted">{t('homepage.noResults')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

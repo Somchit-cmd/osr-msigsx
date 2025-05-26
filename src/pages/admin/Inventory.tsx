@@ -24,14 +24,17 @@ import { Search, Plus, Edit, ArrowDown, ArrowUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { InventoryItem } from "@/types";
 import placeholderImg from "/placeholder.svg";
+import { useTranslation } from "react-i18next";
 
 const AdminInventory = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isStockDialogOpen, setIsStockDialogOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [stockAdjustment, setStockAdjustment] = useState({
     type: "increase",
@@ -158,15 +161,15 @@ const AdminInventory = () => {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Manage Office Supplies</h1>
-            <p className="text-text-muted">Manage supplies and stock levels</p>
+            <h1 className="text-3xl font-bold mb-2">{t('inventory.title')}</h1>
+            <p className="text-text-muted">{t('inventory.description')}</p>
           </div>
           
           <Button 
             className="mt-4 md:mt-0 bg-brand-blue hover:bg-brand-blue/90"
             onClick={() => setIsAddDialogOpen(true)}
           >
-            <Plus className="h-4 w-4 mr-2" /> Add New Item
+            <Plus className="h-4 w-4 mr-2" /> {t('inventory.addNewItem')}
           </Button>
         </div>
         
@@ -176,27 +179,41 @@ const AdminInventory = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search inventory..."
+                  placeholder={t('inventory.searchPlaceholder')}
                   className="pl-9"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               
-              <Tabs 
-                defaultValue="all" 
-                value={activeCategory} 
-                onValueChange={setActiveCategory}
-                className="w-full md:w-auto"
-              >
-                <TabsList className="grid grid-cols-3 md:grid-cols-5 h-10">
-                  {uniqueCategories.slice(0, 5).map((category) => (
-                    <TabsTrigger key={category} value={category} className="capitalize">
-                      {category === "all" ? "All Items" : category}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
+              <div className="flex flex-wrap gap-2 mb-6">
+                <Button
+                  variant={activeCategory === "all" ? "default" : "outline"}
+                  className={`rounded-full ${
+                    activeCategory === "all" 
+                      ? "bg-brand-blue text-white" 
+                      : "bg-white text-text-dark hover:bg-gray-50"
+                  }`}
+                  onClick={() => setActiveCategory("all")}
+                >
+                  {t('categories.allItems')}
+                </Button>
+
+                {uniqueCategories.slice(1).map((category) => (
+                  <Button
+                    key={category}
+                    variant={activeCategory === category ? "default" : "outline"}
+                    className={`rounded-full ${
+                      activeCategory === category 
+                        ? "bg-brand-blue text-white" 
+                        : "bg-white text-text-dark hover:bg-gray-50"
+                    }`}
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {t(`categories.${category.toLowerCase().replace(/\s+/g, '')}`)}
+                  </Button>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -205,19 +222,19 @@ const AdminInventory = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="bg-gray-100 font-bold">Item</TableHead>
-                <TableHead className="bg-gray-100 font-bold">Category</TableHead>
-                <TableHead className="text-center bg-gray-100 font-bold">Available</TableHead>
-                <TableHead className="text-center bg-gray-100 font-bold">Max Stock</TableHead>
-                <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
-                <TableHead className="text-right bg-gray-100 font-bold">Actions</TableHead>
+                <TableHead className="bg-gray-100 font-bold">{t('inventory.table.item')}</TableHead>
+                <TableHead className="bg-gray-100 font-bold">{t('inventory.table.category')}</TableHead>
+                <TableHead className="text-center bg-gray-100 font-bold">{t('inventory.table.available')}</TableHead>
+                <TableHead className="text-center bg-gray-100 font-bold">{t('inventory.table.maxStock')}</TableHead>
+                <TableHead className="text-center bg-gray-100 font-bold">{t('inventory.table.status')}</TableHead>
+                <TableHead className="text-right bg-gray-100 font-bold">{t('inventory.table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredInventory.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-10 text-gray-500">
-                    No items found matching your criteria
+                    {t('inventory.noItems')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -305,25 +322,25 @@ const AdminInventory = () => {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Add New Equipment</DialogTitle>
+            <DialogTitle>{t('inventory.addNew.title')}</DialogTitle>
             <DialogDescription>
-              Add a new equipment item to the inventory.
+              {t('inventory.addNew.description')}
             </DialogDescription>
           </DialogHeader>
           <form className="space-y-4 py-4" onSubmit={e => { e.preventDefault(); handleAddItem(newItem); }}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Equipment Name</Label>
+                <Label htmlFor="name">{t('inventory.addNew.equipmentName')}</Label>
                 <Input
                   id="name"
                   value={newItem.name}
                   onChange={e => setNewItem({ ...newItem, name: e.target.value })}
                   required
-                  placeholder="Item name"
+                  placeholder={t('inventory.addNew.namePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">{t('inventory.addNew.category')}</Label>
                 <select
                   id="category"
                   value={newItem.category}
@@ -331,7 +348,7 @@ const AdminInventory = () => {
                   required
                   className="w-full border rounded px-2 py-2"
                 >
-                  <option value="">Select category</option>
+                  <option value="">{t('inventory.addNew.selectCategory')}</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.name}>{cat.name}</option>
                   ))}
@@ -340,12 +357,12 @@ const AdminInventory = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('inventory.addNew.description')}</Label>
               <Textarea
                 id="description"
                 value={newItem.description}
                 onChange={e => setNewItem({ ...newItem, description: e.target.value })}
-                placeholder="Brief description of the equipment..."
+                placeholder={t('inventory.addNew.descriptionPlaceholder')}
                 rows={3}
                 required
               />
@@ -353,7 +370,7 @@ const AdminInventory = () => {
             
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="available">Available</Label>
+                <Label htmlFor="available">{t('inventory.addNew.available')}</Label>
                 <Input
                   id="available"
                   type="number"
@@ -364,7 +381,7 @@ const AdminInventory = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="totalStock">Total Stock</Label>
+                <Label htmlFor="totalStock">{t('inventory.addNew.totalStock')}</Label>
                 <Input
                   id="totalStock"
                   type="number"
@@ -375,7 +392,7 @@ const AdminInventory = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="minQuantity">Min Quantity</Label>
+                <Label htmlFor="minQuantity">{t('inventory.addNew.minQuantity')}</Label>
                 <Input
                   id="minQuantity"
                   type="number"
@@ -388,7 +405,7 @@ const AdminInventory = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="image">Image (optional)</Label>
+              <Label htmlFor="image">{t('inventory.addNew.image')}</Label>
               <Input
                 id="image"
                 type="file"
@@ -404,7 +421,7 @@ const AdminInventory = () => {
                 }}
               />
               {newItem.image && (
-                <img src={newItem.image} alt="Preview" className="w-16 h-16 object-contain mt-2" />
+                <img src={newItem.image} alt={t('inventory.addNew.preview')} className="w-16 h-16 object-contain mt-2" />
               )}
             </div>
             
@@ -414,13 +431,13 @@ const AdminInventory = () => {
                 variant="outline" 
                 onClick={() => setIsAddDialogOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button 
                 type="submit"
                 disabled={!newItem.name || !newItem.category || !newItem.description}
               >
-                Add Item
+                {t('inventory.addNew.addItem')}
               </Button>
             </DialogFooter>
           </form>
@@ -431,9 +448,9 @@ const AdminInventory = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Edit Equipment</DialogTitle>
+            <DialogTitle>{t('inventory.editEquipment')}</DialogTitle>
             <DialogDescription>
-              Update equipment details and settings.
+              {t('inventory.editEquipmentDescription')}
             </DialogDescription>
           </DialogHeader>
           {selectedItem && (
@@ -446,7 +463,7 @@ const AdminInventory = () => {
             >
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-name">Equipment Name</Label>
+                  <Label htmlFor="edit-name">{t('inventory.name')}</Label>
                   <Input
                     id="edit-name"
                     value={editItem.name}
@@ -455,7 +472,7 @@ const AdminInventory = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-category">Category</Label>
+                  <Label htmlFor="edit-category">{t('inventory.category')}</Label>
                   <select
                     id="edit-category"
                     value={editItem.category}
@@ -463,7 +480,7 @@ const AdminInventory = () => {
                     required
                     className="w-full border rounded px-2 py-2"
                   >
-                    <option value="">Select category</option>
+                    <option value="">{t('inventory.selectCategory')}</option>
                     {categories.map(cat => (
                       <option key={cat.id} value={cat.name}>{cat.name}</option>
                     ))}
@@ -472,7 +489,7 @@ const AdminInventory = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-description">Description</Label>
+                <Label htmlFor="edit-description">{t('inventory.description')}</Label>
                 <Textarea
                   id="edit-description"
                   value={editItem.description}
@@ -484,7 +501,7 @@ const AdminInventory = () => {
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-available">Available</Label>
+                  <Label htmlFor="edit-available">{t('inventory.available')}</Label>
                   <Input
                     id="edit-available"
                     type="number"
@@ -495,7 +512,7 @@ const AdminInventory = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-totalStock">Total Stock</Label>
+                  <Label htmlFor="edit-totalStock">{t('inventory.totalStock')}</Label>
                   <Input
                     id="edit-totalStock"
                     type="number"
@@ -506,7 +523,7 @@ const AdminInventory = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-minQuantity">Min Quantity</Label>
+                  <Label htmlFor="edit-minQuantity">{t('inventory.minQuantity')}</Label>
                   <Input
                     id="edit-minQuantity"
                     type="number"
@@ -519,7 +536,7 @@ const AdminInventory = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-image">Image (optional)</Label>
+                <Label htmlFor="edit-image">{t('inventory.image')}</Label>
                 <Input
                   id="edit-image"
                   type="file"
@@ -539,24 +556,34 @@ const AdminInventory = () => {
                 )}
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="flex justify-between">
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
+                  variant="destructive" 
+                  onClick={() => setIsDeleteConfirmOpen(true)}
+                  className="bg-red-600 hover:bg-red-700"
                 >
-                  Cancel
+                  {t('inventory.deleteEquipment')}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    !editItem.name ||
-                    !editItem.category ||
-                    !editItem.description
-                  }
-                >
-                  Save Changes
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                  >
+                    {t('common.cancel')}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={
+                      !editItem.name ||
+                      !editItem.category ||
+                      !editItem.description
+                    }
+                  >
+                    {t('inventory.saveChanges')}
+                  </Button>
+                </div>
               </DialogFooter>
             </form>
           )}
@@ -568,17 +595,17 @@ const AdminInventory = () => {
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>
-              {stockAdjustment.type === "increase" ? "Add Stock" : "Remove Stock"}
+              {stockAdjustment.type === "increase" ? t('inventory.addStock') : t('inventory.removeStock')}
             </DialogTitle>
             <DialogDescription>
               {stockAdjustment.type === "increase"
-                ? `Add more units to ${selectedItem?.name} inventory.`
-                : `Remove units from ${selectedItem?.name} inventory.`}
+                ? t('inventory.addStockDescription', {name: selectedItem?.name})
+                : t('inventory.removeStockDescription', {name: selectedItem?.name})}
             </DialogDescription>
           </DialogHeader>
           <form className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="stock-quantity">Quantity</Label>
+              <Label htmlFor="stock-quantity">{t('inventory.quantity')}</Label>
               <Input 
                 id="stock-quantity" 
                 type="number" 
@@ -593,10 +620,10 @@ const AdminInventory = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="stock-notes">Notes (Optional)</Label>
+              <Label htmlFor="stock-notes">{t('inventory.notes')}</Label>
               <Textarea
                 id="stock-notes"
-                placeholder="Reason for this adjustment..."
+                placeholder={t('inventory.notesPlaceholder')}
                 value={stockAdjustment.notes}
                 onChange={(e) => setStockAdjustment({
                   ...stockAdjustment,
@@ -612,7 +639,7 @@ const AdminInventory = () => {
                 variant="outline" 
                 onClick={() => setIsStockDialogOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button 
                 type="button"
@@ -622,10 +649,42 @@ const AdminInventory = () => {
                   : "bg-red-600 hover:bg-red-700"
                 }
               >
-                {stockAdjustment.type === "increase" ? "Add Stock" : "Remove Stock"}
+                {stockAdjustment.type === "increase" ? t('inventory.addStock') : t('inventory.removeStock')}
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>{t('inventory.confirmDelete')}</DialogTitle>
+            <DialogDescription>
+              {t('inventory.confirmDeleteDescription', {name: selectedItem?.name})}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsDeleteConfirmOpen(false)}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button 
+              type="button"
+              variant="destructive"
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                handleRemoveItem(selectedItem?.id);
+                setIsDeleteConfirmOpen(false);
+              }}
+            >
+              {t('inventory.delete')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       

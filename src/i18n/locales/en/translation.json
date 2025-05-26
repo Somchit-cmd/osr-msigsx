@@ -1,0 +1,320 @@
+{
+  "header": {
+    "manageSupplies": "Manage Office Supplies",
+    "manageSuppliesDesc": "Manage supplies and stock levels",
+    "equipment": "Equipment",
+    "myRequests": "My Requests",
+    "dashboard": "Dashboard",
+    "requests": "Requests",
+    "inventory": "Inventory",
+    "reports": "Reports",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "buttons": {
+    "addNew": "Add New Item",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "delete": "Delete Equipment",
+    "confirm": "Confirm"
+  },
+  "inventory": {
+    "title": "Manage Office Supplies",
+    "description": "Manage supplies and stock levels",
+    "addNewItem": "Add New Item",
+    "searchPlaceholder": "Search inventory...",
+    "noItems": "No items found matching your criteria",
+    "deleteEquipment": "Delete Equipment",
+    "saveChanges": "Save Changes",
+    "addStock": "Add Stock",
+    "removeStock": "Remove Stock",
+    "addStockDescription": "Add more units to {{name}} inventory.",
+    "removeStockDescription": "Remove units from {{name}} inventory.",
+    "quantity": "Quantity",
+    "notes": "Notes (Optional)",
+    "notesPlaceholder": "Reason for this adjustment...",
+    "confirmDelete": "Confirm Delete",
+    "confirmDeleteDescription": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+    "delete": "Delete",
+    "image": "Image (optional)",
+    "allItems": "All Items",
+    "item": "Item",
+    "category": "Category",
+    "available": "Available",
+    "maxStock": "Max Stock",
+    "status": "Status",
+    "actions": "Actions",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "inStock": "In Stock",
+    "addNew": {
+      "title": "Add New Equipment",
+      "description": "Add a new equipment item to the inventory.",
+      "equipmentName": "Equipment Name",
+      "namePlaceholder": "Item name",
+      "category": "Category",
+      "selectCategory": "Select category",
+      "descriptionPlaceholder": "Brief description of the equipment...",
+      "available": "Available",
+      "totalStock": "Total Stock",
+      "minQuantity": "Min Quantity",
+      "image": "Image (optional)",
+      "preview": "Preview",
+      "addItem": "Add Item"
+    },
+    "editEquipment": "Edit Equipment",
+    "editEquipmentDescription": "Update equipment details and settings",
+    "name": "Equipment Name",
+    "chooseFile": "Choose File",
+    "noFileChosen": "No file chosen",
+    "totalStock": "Total Stock",
+    "minQuantity": "Min Quantity",
+    "selectCategory": "Select category",
+    "table": {
+      "item": "Item",
+      "category": "Category",
+      "available": "Available",
+      "maxStock": "Max Stock",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  },
+  "homepage": {
+    "title": "Available Office Supplies",
+    "subtitle": "Browse and request supplies for your needs",
+    "searchPlaceholder": "Search supplies...",
+    "noResults": "No supplies found matching your criteria.",
+    "requestNow": "Request Now"
+  },
+  "equipment": {
+    "available": "{{count}} available",
+    "outOfStock": "Out of stock"
+  },
+  "categories": {
+    "allItems": "All Items",
+    "writing": "Writing",
+    "desktools": "Desk Tools",
+    "paper": "Paper",
+    "electronics": "Electronics",
+    "tapes&glue": "Tapes & Glue",
+    "binding": "Binding"
+  },
+  "requestForm": {
+    "title": "Request Office Supplies",
+    "description": "Fill out this form to request {{name}}. You'll be notified when your request is processed.",
+    "fullName": "Full Name",
+    "department": "Department",
+    "officeSupply": "Office Supply",
+    "quantity": "Quantity",
+    "notes": "Notes (Optional)",
+    "notesPlaceholder": "Add any additional details about your request...",
+    "submit": "Submit Request",
+    "available": "{{count}} available"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "remove": "Remove"
+  },
+  "myRequests": {
+    "title": "My Requests",
+    "all": "All ({{count}})",
+    "pending": "Pending ({{count}})",
+    "approved": "Approved ({{count}})",
+    "rejected": "Rejected ({{count}})",
+    "fulfilled": "Fulfilled ({{count}})"
+  },
+  "requestTable": {
+    "equipment": "Equipment",
+    "employee": "Employee",
+    "department": "Department",
+    "quantity": "Quantity",
+    "requestDate": "Request Date",
+    "approveDate": "Approve Date",
+    "fulfilledDate": "Fulfilled Date",
+    "status": "Status",
+    "actions": "Actions",
+    "noRequests": "No requests found",
+    "hide": "Hide",
+    "details": "Details",
+    "approve": "Approve",
+    "reject": "Reject",
+    "fulfill": "Fulfill",
+    "cancel": "Cancel",
+    "requestNotes": "Request Notes",
+    "adminNotes": "Admin Notes",
+    "rejectRequest": "Reject Request",
+    "rejectReasonPlaceholder": "Enter reason for rejection (optional)",
+    "confirmReject": "Confirm Rejection",
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "fulfilled": "Fulfilled",
+      "cancelled": "Cancelled"
+    }
+  },
+  "logout": {
+    "title": "Confirm Logout",
+    "message": "Are you sure you want to log out?",
+    "confirm": "Log Out"
+  },
+  "pagination": {
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noUnread": "No unread notifications"
+  },
+  "login": {
+    "welcomeTitle": "Welcome to MSIGSX OSR",
+    "welcomeDescription": "Please sign in with your staff credentials to continue.",
+    "employeeId": "Employee ID",
+    "employeeIdPlaceholder": "Your staff id number",
+    "password": "Password",
+    "passwordPlaceholder": "Repeat your staff id number",
+    "rememberMe": "Remember me",
+    "login": "Log in",
+    "loggingIn": "Logging in...",
+    "successTitle": "Login successful",
+    "successMessage": "Welcome, {{name}}!",
+    "failedTitle": "Login failed",
+    "invalidPassword": "Invalid password",
+    "userNotFound": "User not found",
+    "logoAlt": "Company Logo"
+  },
+  "adminDashboard": {
+    "title": "Admin Dashboard",
+    "overview": "Overview of office supply requests and inventory",
+    "requestsToday": "Requests Today",
+    "requestsThisWeek": "Requests This Week",
+    "pendingApprovals": "Pending Approvals",
+    "lowStockItems": "Low Stock / Out of Stock Items",
+    "lowStockAlert": {
+      "title": "Low Stock Alert",
+      "description": "Office supplies that need restocking",
+      "sufficientStock": "All items have sufficient stock"
+    },
+    "recentRequests": {
+      "title": "Recent Requests",
+      "description": "Recent supply requests requiring approval"
+    }
+  },
+  "requestActions": {
+    "approvedTitle": "Request approved",
+    "approvedDescription": "Request #{{id}} has been approved successfully.",
+    "rejectedTitle": "Request rejected",
+    "rejectedDescription": "Request #{{id}} has been rejected successfully.",
+    "fulfilledTitle": "Request fulfilled",
+    "fulfilledDescription": "Request #{{id}} has been fulfilled successfully."
+  },
+  "adminRequests": {
+    "title": "Manage Supply Requests",
+    "description": "Review and process office supply requests",
+    "tabs": {
+      "all": "All ({{count}})",
+      "pending": "Pending ({{count}})",
+      "approved": "Approved ({{count}})",
+      "rejected": "Rejected ({{count}})",
+      "fulfilled": "Fulfilled ({{count}})"
+    },
+    "searchPlaceholder": "Search by employee or supply name...",
+    "filterByDepartment": "Filter by department",
+    "allDepartments": "All Departments",
+    "clearFilters": "Clear Filters",
+    "actions": {
+      "approvedTitle": "Request approved",
+      "approvedDescription": "Request #{{id}} has been approved successfully.",
+      "rejectedTitle": "Request rejected",
+      "rejectedDescription": "Request #{{id}} has been rejected successfully.",
+      "fulfilledTitle": "Request fulfilled",
+      "fulfilledDescription": "Request #{{id}} has been fulfilled successfully."
+    }
+  },
+  "reports": {
+    "title": "Reports & Analytics",
+    "description": "Generate and export equipment disbursement reports",
+    "periods": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "custom": "Custom"
+    },
+    "exportReport": "Export Report",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "department": "Department",
+    "allDepartments": "All Departments",
+    "totalRequests": "Total Requests",
+    "approvedFulfilled": "Approved/Fulfilled",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "byDepartment": {
+      "title": "Requests by Department",
+      "description": "Distribution of equipment requests by department"
+    },
+    "byStatus": {
+      "title": "Request Status Distribution",
+      "description": "Breakdown of requests by status"
+    },
+    "noData": "No data to display",
+    "detailedData": "Detailed Request Data",
+    "table": {
+      "requestDate": "Request Date",
+      "employee": "Employee",
+      "department": "Department",
+      "equipment": "Equipment",
+      "quantity": "Quantity",
+      "notes": "Notes",
+      "status": "Status",
+      "approvalDate": "Approval Date",
+      "fulfillmentDate": "Fulfillment Date",
+      "adminNotes": "Admin Notes"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "fulfilled": "Fulfilled"
+    },
+    "noDataToExport": "No data to export",
+    "noDataForFilters": "No data available for the selected filters",
+    "reportExported": "Report exported",
+    "exportSuccess": "Report for {{period}} activity has been exported successfully."
+  },
+  "settings": {
+    "userManagement": "User Management",
+    "inventoryManagement": "Inventory Management",
+    "addUser": "Add User",
+    "username": "User ID",
+    "name": "Name",
+    "department": "Department",
+    "role": "Role",
+    "actions": "Actions",
+    "addCategory": "Add Category",
+    "categoryName": "Category Name"
+  },
+  "addUser": {
+    "title": "Add New User",
+    "personalInfo": "Personal Information",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "department": "Department",
+    "selectDepartment": "Select department",
+    "accountInfo": "Account Information",
+    "userId": "User ID",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "employee": "Employee",
+    "admin": "Admin",
+    "addUser": "Add User"
+  },
+  "addCategory": {
+    "title": "Add Category",
+    "categoryName": "Category Name",
+    "add": "Add Category"
+  }
+}

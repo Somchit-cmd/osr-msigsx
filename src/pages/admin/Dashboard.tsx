@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StatCard from "@/components/StatCard";
@@ -27,6 +28,7 @@ import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from "fi
 import { useFCMToken } from "@/hooks/useFCMToken"; // adjust the import path if needed
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [stats, setStats] = useState({
     requestsToday: 0,
@@ -198,8 +200,8 @@ const AdminDashboard = () => {
     await updateDoc(doc(db, "requests", id), update);
 
     toast({
-      title: `Request ${statusMap[action]}`,
-      description: `Request #${id} has been ${statusMap[action]} successfully.`,
+      title: t(`adminDashboard.requestActions.${statusMap[action]}Title`),
+      description: t(`adminDashboard.requestActions.${statusMap[action]}Description`, {id}),
     });
   };
 
@@ -208,31 +210,31 @@ const AdminDashboard = () => {
       <Header userRole="admin" />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('adminDashboard.title')}</h1>
         <p className="text-text-muted mb-8">
-          Overview of office supply requests and inventory
+          {t('adminDashboard.overview')}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title="Requests Today"
+            title={t('adminDashboard.requestsToday')}
             value={stats.requestsToday}
             trend={trend.requestsToday}
             icon={<ClipboardList size={24} />}
           />
           <StatCard
-            title="Requests This Week"
+            title={t('adminDashboard.requestsThisWeek')}
             value={stats.requestsThisWeek}
             trend={trend.requestsThisWeek}
             icon={<ArrowUpRight size={24} />}
           />
           <StatCard
-            title="Pending Approvals"
+            title={t('adminDashboard.pendingApprovals')}
             value={stats.pendingRequests}
             icon={<Clock size={24} />}
           />
           <StatCard
-            title="Low Stock / Out of Stock Items"
+            title={t('adminDashboard.lowStockItems')}
             value={stats.lowStockItems}
             icon={<AlertTriangle size={24} />}
             className={
@@ -244,15 +246,15 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 gap-8">
           <Card>
             <CardHeader>
-              <CardTitle>Low Stock Alert</CardTitle>
+              <CardTitle>{t('adminDashboard.lowStockAlert.title')}</CardTitle>
               <CardDescription>
-                Office supplies that need restocking
+                {t('adminDashboard.lowStockAlert.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {lowStockItems.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  All items have sufficient stock
+                  {t('adminDashboard.lowStockAlert.sufficientStock')}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -277,9 +279,9 @@ const AdminDashboard = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle>Recent Requests</CardTitle>
+              <CardTitle>{t('adminDashboard.recentRequests.title')}</CardTitle>
               <CardDescription>
-                Recent supply requests requiring approval
+                {t('adminDashboard.recentRequests.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>

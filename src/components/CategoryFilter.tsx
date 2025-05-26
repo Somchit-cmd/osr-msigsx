@@ -1,5 +1,5 @@
-
 import { Button } from "@/components/ui/button";
+import { useTranslation } from 'react-i18next';
 
 interface CategoryFilterProps {
   categories: string[];
@@ -12,6 +12,8 @@ export default function CategoryFilter({
   activeCategory, 
   onCategoryChange 
 }: CategoryFilterProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="flex flex-wrap gap-2 mb-6">
       <Button
@@ -23,7 +25,7 @@ export default function CategoryFilter({
         }`}
         onClick={() => onCategoryChange("All Items")}
       >
-        All Items
+        {t('categories.allItems')}
       </Button>
 
       {categories.map((category) => (
@@ -37,7 +39,7 @@ export default function CategoryFilter({
           }`}
           onClick={() => onCategoryChange(category)}
         >
-          {category}
+          {t(`categories.${category.toLowerCase().replace(/[\s&]+/g, '')}`, {defaultValue: category})}
         </Button>
       ))}
     </div>

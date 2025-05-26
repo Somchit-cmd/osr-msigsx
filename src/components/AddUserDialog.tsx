@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { subscribeToDepartments } from "@/lib/departmentService";
+import { useTranslation } from "react-i18next";
 
 type AddUserDialogProps = {
   open: boolean;
@@ -20,6 +21,7 @@ type AddUserDialogProps = {
 };
 
 export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUserDialogProps) {
+  const { t } = useTranslation();
   const [newUser, setNewUser] = useState({
     id: "",
     name: "",
@@ -83,15 +85,15 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Add New User</DialogTitle>
+          <DialogTitle>{t('addUser.title')}</DialogTitle>
         </DialogHeader>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {/* Personal Information */}
           <div>
-            <h3 className="font-semibold mb-2">Personal Information</h3>
+            <h3 className="font-semibold mb-2">{t('addUser.personalInfo')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">First Name</Label>
+                <Label htmlFor="name">{t('addUser.firstName')}</Label>
                 <Input
                   id="name"
                   value={newUser.name}
@@ -100,7 +102,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="surname">Last Name</Label>
+                <Label htmlFor="surname">{t('addUser.lastName')}</Label>
                 <Input
                   id="surname"
                   value={newUser.surname}
@@ -109,7 +111,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="department">Department</Label>
+                <Label htmlFor="department">{t('addUser.department')}</Label>
                 <select
                   id="department"
                   className="w-full border rounded px-2 py-2"
@@ -117,7 +119,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                   onChange={e => setNewUser({ ...newUser, department: e.target.value })}
                   required
                 >
-                  <option value="">Select department</option>
+                  <option value="">{t('addUser.selectDepartment')}</option>
                   {departments.map(dep => (
                     <option key={dep.id} value={dep.name}>{dep.name}</option>
                   ))}
@@ -127,10 +129,10 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
           </div>
           {/* Account Information */}
           <div>
-            <h3 className="font-semibold mb-2">Account Information</h3>
+            <h3 className="font-semibold mb-2">{t('addUser.accountInfo')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="id">User ID</Label>
+                <Label htmlFor="id">{t('addUser.userId')}</Label>
                 <Input
                   id="id"
                   value={newUser.id}
@@ -139,7 +141,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('addUser.email')}</Label>
                 <Input
                   id="email"
                   value={newUser.email}
@@ -149,7 +151,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                 
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('addUser.password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -159,7 +161,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">{t('addUser.role')}</Label>
                 <select
                   id="role"
                   className="w-full border rounded px-2 py-2"
@@ -167,8 +169,8 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                   onChange={e => setNewUser({ ...newUser, role: e.target.value })}
                   required
                 >
-                  <option value="employee">Employee</option>
-                  <option value="admin">Admin</option>
+                  <option value="employee">{t('addUser.employee')}</option>
+                  <option value="admin">{t('addUser.admin')}</option>
                 </select>
               </div>
             </div>
@@ -179,10 +181,10 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
               type="button"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={!isFormValid}>
-              Add User
+              {t('addUser.addUser')}
             </Button>
           </DialogFooter>
         </form>

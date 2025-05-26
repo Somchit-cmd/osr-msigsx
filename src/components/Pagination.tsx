@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
   currentPage: number;
@@ -31,6 +32,7 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
+  const { t } = useTranslation();
   const pageNumbers = getPageNumbers(currentPage, totalPages);
 
   return (
@@ -40,7 +42,7 @@ const Pagination: React.FC<PaginationProps> = ({
         onClick={() => onPageChange(currentPage - 1)}
         className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
       >
-        Prev
+        {t('pagination.prev')}
       </button>
       {pageNumbers.map((num, idx) =>
         num === "..." ? (
@@ -64,7 +66,7 @@ const Pagination: React.FC<PaginationProps> = ({
         onClick={() => onPageChange(currentPage + 1)}
         className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
       >
-        Next
+        {t('pagination.next')}
       </button>
     </div>
   );

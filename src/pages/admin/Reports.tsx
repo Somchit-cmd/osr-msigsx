@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -42,6 +43,7 @@ import Papa from "papaparse";
 const PAGE_SIZE = 10;
 
 const AdminReports = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("daily");
   const [startDate, setStartDate] = useState(
@@ -111,8 +113,8 @@ const AdminReports = () => {
   const generateReport = () => {
     if (filteredRequests.length === 0) {
       toast({
-        title: "No data to export",
-        description: "There are no requests for the selected filters.",
+        title: t('reports.noDataToExport'),
+        description: t('reports.noDataForFilters'),
         variant: "destructive",
       });
       return;
@@ -145,8 +147,8 @@ const AdminReports = () => {
     document.body.removeChild(link);
 
     toast({
-      title: "Report exported",
-      description: `Report for ${activeTab} activity has been exported successfully.`,
+      title: t('reports.reportExported'),
+      description: t('reports.exportSuccess', {period: t(`reports.periods.${activeTab}`)}),
     });
   };
 
@@ -210,9 +212,9 @@ const AdminReports = () => {
       <Header userRole="admin" />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Reports & Analytics</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('reports.title')}</h1>
         <p className="text-text-muted mb-8">
-          Generate and export equipment disbursement reports
+          {t('reports.description')}
         </p>
 
         <div className="bg-white rounded-lg border p-6 mb-8">
@@ -224,10 +226,10 @@ const AdminReports = () => {
               className="flex-1"
             >
               <TabsList className="grid grid-cols-4 h-10 w-full md:w-[400px]">
-                <TabsTrigger value="daily">Daily</TabsTrigger>
-                <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                <TabsTrigger value="custom">Custom</TabsTrigger>
+                <TabsTrigger value="daily">{t('reports.periods.daily')}</TabsTrigger>
+                <TabsTrigger value="weekly">{t('reports.periods.weekly')}</TabsTrigger>
+                <TabsTrigger value="monthly">{t('reports.periods.monthly')}</TabsTrigger>
+                <TabsTrigger value="custom">{t('reports.periods.custom')}</TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -235,7 +237,7 @@ const AdminReports = () => {
               onClick={generateReport}
               className="bg-brand-blue hover:bg-brand-blue/90"
             >
-              <Download className="h-4 w-4 mr-2" /> Export Report
+              <Download className="h-4 w-4 mr-2" /> {t('reports.exportReport')}
             </Button>
           </div>
 
@@ -244,7 +246,7 @@ const AdminReports = () => {
               <>
                 <div>
                   <label className="block text-sm font-medium text-text-muted mb-1">
-                    Start Date
+                    {t('reports.startDate')}
                   </label>
                   <Input
                     type="date"
@@ -254,7 +256,7 @@ const AdminReports = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-text-muted mb-1">
-                    End Date
+                    {t('reports.endDate')}
                   </label>
                   <Input
                     type="date"
@@ -266,14 +268,14 @@ const AdminReports = () => {
             )}
             <div>
               <label className="block text-sm font-medium text-text-muted mb-1">
-                Department
+                {t('reports.department')}
               </label>
               <Select value={department} onValueChange={setDepartment}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All Departments" />
+                  <SelectValue placeholder={t('reports.allDepartments')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
+                  <SelectItem value="all">{t('reports.allDepartments')}</SelectItem>
                   {departments.map((dept) => (
                     <SelectItem key={dept.id} value={dept.name}>
                       {dept.name}
@@ -288,7 +290,7 @@ const AdminReports = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="text-4xl font-bold mb-1">{totalRequests}</div>
-                <div className="text-sm text-text-muted">Total Requests</div>
+                <div className="text-sm text-text-muted">{t('reports.totalRequests')}</div>
               </CardContent>
             </Card>
 
@@ -298,7 +300,7 @@ const AdminReports = () => {
                   {approvedOnly}
                 </div>
                 <div className="text-sm text-text-muted">
-                  Approved/Fulfilled
+                  {t('reports.approvedFulfilled')}
                 </div>
               </CardContent>
             </Card>
@@ -308,7 +310,7 @@ const AdminReports = () => {
                 <div className="text-4xl font-bold mb-1 text-yellow-600">
                   {pendingOnly}
                 </div>
-                <div className="text-sm text-text-muted">Pending</div>
+                <div className="text-sm text-text-muted">{t('reports.pending')}</div>
               </CardContent>
             </Card>
 
@@ -317,7 +319,7 @@ const AdminReports = () => {
                 <div className="text-4xl font-bold mb-1 text-red-600">
                   {rejectedOnly}
                 </div>
-                <div className="text-sm text-text-muted">Rejected</div>
+                <div className="text-sm text-text-muted">{t('reports.rejected')}</div>
               </CardContent>
             </Card>
           </div>
@@ -326,16 +328,16 @@ const AdminReports = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <RePieChart className="h-5 w-5 mr-2" /> Requests by Department
+                  <RePieChart className="h-5 w-5 mr-2" /> {t('reports.byDepartment.title')}
                 </CardTitle>
                 <CardDescription>
-                  Distribution of equipment requests by department
+                  {t('reports.byDepartment.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-80 flex items-center justify-center">
                 {departmentData.length === 0 ? (
                   <div className="text-center text-gray-500">
-                    <p>No data to display</p>
+                    <p>{t('reports.noData')}</p>
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
@@ -366,17 +368,16 @@ const AdminReports = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <PieChart className="h-5 w-5 mr-2" /> Request Status
-                  Distribution
+                  <PieChart className="h-5 w-5 mr-2" /> {t('reports.byStatus.title')}
                 </CardTitle>
                 <CardDescription>
-                  Breakdown of requests by status
+                  {t('reports.byStatus.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-80 flex items-center justify-center">
                 {statusData.every(d => d.value === 0) ? (
                   <div className="text-center text-gray-500">
-                    <p>No data to display</p>
+                    <p>{t('reports.noData')}</p>
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
@@ -388,7 +389,7 @@ const AdminReports = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={100}
-                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                        label={({ name, percent }) => `${t(`reports.statuses.${name.toLowerCase()}`)} (${(percent * 100).toFixed(0)}%)`}
                       >
                         {statusData.map((entry, index) => (
                           <Cell
@@ -407,41 +408,41 @@ const AdminReports = () => {
 
           <div>
             <h3 className="text-lg font-semibold mb-4">
-              Detailed Request Data
+              {t('reports.detailedData')}
             </h3>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="bg-gray-100 font-bold">
-                      Request Date
+                      {t('reports.table.requestDate')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Employee
+                      {t('reports.table.employee')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Department
+                      {t('reports.table.department')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Equipment
+                      {t('reports.table.equipment')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Quantity
+                      {t('reports.table.quantity')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Notes
+                      {t('reports.table.notes')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Status
+                      {t('reports.table.status')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Approval Date
+                      {t('reports.table.approvalDate')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Fulfillment Date
+                      {t('reports.table.fulfillmentDate')}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      Admin Notes
+                      {t('reports.table.adminNotes')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -452,7 +453,7 @@ const AdminReports = () => {
                         colSpan={10}
                         className="text-center py-10 text-gray-500"
                       >
-                        No data available for the selected filters
+                        {t('reports.noDataForFilters')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -473,8 +474,7 @@ const AdminReports = () => {
                             variant="outline"
                             className={getStatusBadgeClass(request.status)}
                           >
-                            {request.status.charAt(0).toUpperCase() +
-                              request.status.slice(1)}
+                            {t(`reports.statuses.${request.status}`)}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -506,7 +506,7 @@ const AdminReports = () => {
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
               />
-            )}{" "}
+            )}
           </div>
         </div>
       </main>

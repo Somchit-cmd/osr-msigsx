@@ -19,6 +19,7 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { useTranslation } from 'react-i18next';
 
 interface RequestFormProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export default function RequestForm({
   equipment,
   onSubmit,
 }: RequestFormProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   // Set up form state
@@ -150,15 +152,15 @@ export default function RequestForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Request Office Supplies</DialogTitle>
+          <DialogTitle>{t('requestForm.title')}</DialogTitle>
           <DialogDescription>
-            Fill out this form to request {equipment?.name}. You'll be notified when your request is processed.
+            {t('requestForm.description', { name: equipment?.name })}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="employeeName">Full Name</Label>
+              <Label htmlFor="employeeName">{t('requestForm.fullName')}</Label>
               <Input
                 id="employeeName"
                 value={formData.employeeName}
@@ -168,7 +170,7 @@ export default function RequestForm({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
+              <Label htmlFor="department">{t('requestForm.department')}</Label>
               <Input
                 id="department"
                 value={formData.department}
@@ -179,7 +181,7 @@ export default function RequestForm({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="equipment">Office Supply</Label>
+            <Label htmlFor="equipment">{t('requestForm.officeSupply')}</Label>
             <Input
               id="equipment"
               value={equipment?.name || ""}
@@ -189,7 +191,7 @@ export default function RequestForm({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="quantity">Quantity</Label>
+            <Label htmlFor="quantity">{t('requestForm.quantity')}</Label>
             <div className="flex items-center">
               <Input
                 id="quantity"
@@ -201,16 +203,16 @@ export default function RequestForm({
                 className="w-24"
               />
               <span className="ml-2 text-gray-500 text-sm">
-                {equipment?.available || 0} available
+                {t('requestForm.available', { count: equipment?.available || 0 })}
               </span>
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Label htmlFor="notes">{t('requestForm.notes')}</Label>
             <Textarea
               id="notes"
-              placeholder="Add any additional details about your request..."
+              placeholder={t('requestForm.notesPlaceholder')}
               value={formData.notes}
               onChange={(e) => handleChange("notes", e.target.value)}
               rows={3}
@@ -219,10 +221,10 @@ export default function RequestForm({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="bg-brand-blue hover:bg-brand-blue/90">
-              Submit Request
+              {t('requestForm.submit')}
             </Button>
           </DialogFooter>
         </form>

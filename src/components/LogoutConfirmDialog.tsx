@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from 'react-i18next';
 
 type LogoutConfirmDialogProps = {
   open: boolean;
@@ -8,16 +9,18 @@ type LogoutConfirmDialogProps = {
 };
 
 export default function LogoutConfirmDialog({ open, onOpenChange, onConfirm }: LogoutConfirmDialogProps) {
+  const { t } = useTranslation();
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm Logout</DialogTitle>
+          <DialogTitle>{t('logout.title')}</DialogTitle>
         </DialogHeader>
-        <p>Are you sure you want to log out?</p>
+        <p>{t('logout.message')}</p>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="destructive"
@@ -26,7 +29,7 @@ export default function LogoutConfirmDialog({ open, onOpenChange, onConfirm }: L
               onOpenChange(false);
             }}
           >
-            Log Out
+            {t('logout.confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

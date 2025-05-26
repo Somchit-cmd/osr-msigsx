@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { collection, addDoc } from "firebase/firestore";
+import { useTranslation } from 'react-i18next';
 
 interface RequestTableProps {
   requests: EquipmentRequest[];
@@ -25,6 +26,7 @@ interface RequestTableProps {
 }
 
 export default function RequestTable({ requests, isAdmin = false, onAction }: RequestTableProps) {
+  const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
@@ -107,22 +109,22 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[180px] bg-gray-100 font-bold">Equipment</TableHead>
-              {isAdmin && <TableHead className="bg-gray-100 font-bold">Employee</TableHead>}
-              {isAdmin && <TableHead className="bg-gray-100 font-bold">Department</TableHead>}
-              <TableHead className="text-center bg-gray-100 font-bold">Quantity</TableHead>
-              <TableHead className="text-center bg-gray-100 font-bold">Request Date</TableHead>
-              <TableHead className="text-center bg-gray-100 font-bold">Approve Date</TableHead>
-              <TableHead className="text-center bg-gray-100 font-bold">Fulfilled Date</TableHead>
-              <TableHead className="text-center bg-gray-100 font-bold">Status</TableHead>
-              <TableHead className="text-right bg-gray-100 font-bold">Actions</TableHead>
+              <TableHead className="w-[180px] bg-gray-100 font-bold">{t('requestTable.equipment')}</TableHead>
+              {isAdmin && <TableHead className="bg-gray-100 font-bold">{t('requestTable.employee')}</TableHead>}
+              {isAdmin && <TableHead className="bg-gray-100 font-bold">{t('requestTable.department')}</TableHead>}
+              <TableHead className="text-center bg-gray-100 font-bold">{t('requestTable.quantity')}</TableHead>
+              <TableHead className="text-center bg-gray-100 font-bold">{t('requestTable.requestDate')}</TableHead>
+              <TableHead className="text-center bg-gray-100 font-bold">{t('requestTable.approveDate')}</TableHead>
+              <TableHead className="text-center bg-gray-100 font-bold">{t('requestTable.fulfilledDate')}</TableHead>
+              <TableHead className="text-center bg-gray-100 font-bold">{t('requestTable.status')}</TableHead>
+              <TableHead className="text-right bg-gray-100 font-bold">{t('requestTable.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {requests.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={isAdmin ? 7 : 5} className="text-center py-8 text-gray-500">
-                  No requests found
+                  {t('requestTable.noRequests')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -150,7 +152,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge variant="outline" className={`${getStatusBadgeClass(request.status)}`}>
-                        {capitalizeFirstLetter(request.status)}
+                        {t(`requestTable.statuses.${request.status}`)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -160,7 +162,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                           size="sm"
                           onClick={() => toggleExpand(request.id)}
                         >
-                          {expandedId === request.id ? "Hide" : "Details"}
+                          {expandedId === request.id ? t('requestTable.hide') : t('requestTable.details')}
                         </Button>
                         
                         {isAdmin && request.status === "pending" && (
@@ -171,7 +173,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                               onClick={() => actionHandler(request.id, "approve")}
                               className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
                             >
-                              Approve
+                              {t('requestTable.approve')}
                             </Button>
                             <Button
                               variant="outline"
@@ -179,7 +181,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                               onClick={() => handleReject(request.id)}
                               className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
                             >
-                              Reject
+                              {t('requestTable.reject')}
                             </Button>
                           </>
                         )}
@@ -191,7 +193,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                             onClick={() => actionHandler(request.id, "fulfill")}
                             className="bg-blue-100 text-blue-700 hover:bg-blue-200 ml-2"
                           >
-                            Fulfill
+                            {t('requestTable.fulfill')}
                           </Button>
                         )}
 
@@ -209,7 +211,7 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                             }}
                             className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
                           >
-                            Cancel
+                            {t('requestTable.cancel')}
                           </Button>
                         )}
                       </div>
@@ -221,32 +223,32 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
                         <div className="space-y-2 text-sm">
                           {request.notes && (
                             <div>
-                              <span className="font-medium">Request Notes:</span> {request.notes}
+                              <span className="font-medium">{t('requestTable.requestNotes')}:</span> {request.notes}
                             </div>
                           )}
                           
                           {request.adminNotes && (
                             <div>
-                              <span className="font-medium">Admin Notes:</span> {request.adminNotes}
+                              <span className="font-medium">{t('requestTable.adminNotes')}:</span> {request.adminNotes}
                             </div>
                           )}
                           
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <span className="font-medium">Request Date:</span>{" "}
+                              <span className="font-medium">{t('requestTable.requestDate')}:</span>{" "}
                               {formatDate(request.createdAt)}
                             </div>
                             
                             {request.approvalDate && (
                               <div>
-                                <span className="font-medium">Approval Date:</span>{" "}
+                                <span className="font-medium">{t('requestTable.approveDate')}:</span>{" "}
                                 {formatDate(request.approvalDate)}
                               </div>
                             )}
                             
                             {request.fulfillmentDate && (
                               <div>
-                                <span className="font-medium">Fulfillment Date:</span>{" "}
+                                <span className="font-medium">{t('requestTable.fulfilledDate')}:</span>{" "}
                                 {formatDate(request.fulfillmentDate)}
                               </div>
                             )}
@@ -265,11 +267,11 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reject Request</DialogTitle>
+            <DialogTitle>{t('requestTable.rejectRequest')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Textarea
-              placeholder="Enter reason for rejection (optional)"
+              placeholder={t('requestTable.rejectReasonPlaceholder')}
               value={rejectNote}
               onChange={(e) => setRejectNote(e.target.value)}
               className="min-h-[100px]"
@@ -280,13 +282,13 @@ export default function RequestTable({ requests, isAdmin = false, onAction }: Re
               variant="outline"
               onClick={() => setRejectDialogOpen(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={confirmReject}
             >
-              Confirm Rejection
+              {t('requestTable.confirmReject')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,8 +3,10 @@ import { db } from "@/lib/firebase";
 import { collection, query, where, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
 import { Bell, CheckCircle, XCircle, PackageCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 export default function NotificationBell({ userId }) {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -81,7 +83,7 @@ export default function NotificationBell({ userId }) {
         }}
         onMouseOver={e => e.currentTarget.style.background = "#f0f4fa"}
         onMouseOut={e => e.currentTarget.style.background = "white"}
-        title="Notifications"
+        title={t('notifications.title')}
       >
         <Bell size={22} color="#5457F6" />
         {unreadCount > 0 && (
@@ -126,7 +128,7 @@ export default function NotificationBell({ userId }) {
             borderTopRightRadius: "8px",
             color: "#5457F6"
           }}>
-            <span>Notifications</span>
+            <span>{t('notifications.title')}</span>
             <button
               onClick={markAllAsRead}
               style={{
@@ -137,13 +139,15 @@ export default function NotificationBell({ userId }) {
                 cursor: "pointer",
                 fontSize: "13px"
               }}
-              title="Mark all as read"
+              title={t('notifications.markAllRead')}
             >
-              Mark all as read
+              {t('notifications.markAllRead')}
             </button>
           </div>
           {notifications.filter(n => !n.read).length === 0 ? (
-            <div style={{ padding: "24px", textAlign: "center", color: "#888" }}>No unread notifications</div>
+            <div style={{ padding: "24px", textAlign: "center", color: "#888" }}>
+              {t('notifications.noUnread')}
+            </div>
           ) : (
             notifications
               .filter(n => !n.read)

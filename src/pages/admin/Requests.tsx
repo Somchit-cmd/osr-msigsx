@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { subscribeToAllRequests } from "@/lib/requestService";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -18,6 +19,7 @@ import Pagination from "@/components/Pagination";
 const PAGE_SIZE = 10;
 
 const AdminRequests = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,8 +121,8 @@ const AdminRequests = () => {
     }
 
     toast({
-      title: `Request ${statusMap[action]}`,
-      description: `Request #${id} has been ${statusMap[action]} successfully.`,
+      title: t(`adminRequests.actions.${statusMap[action]}Title`),
+      description: t(`adminRequests.actions.${statusMap[action]}Description`, {id}),
     });
   };
   
@@ -141,25 +143,25 @@ const AdminRequests = () => {
       <Header userRole="admin" />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Manage Supply Requests</h1>
-        <p className="text-text-muted mb-8">Review and process office supply requests</p>
+        <h1 className="text-3xl font-bold mb-2">{t('adminRequests.title')}</h1>
+        <p className="text-text-muted mb-8">{t('adminRequests.description')}</p>
         
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-5 h-auto mb-6">
             <TabsTrigger value="all" className="px-4 py-2">
-              All ({allCount})
+              {t('adminRequests.tabs.all', {count: allCount})}
             </TabsTrigger>
             <TabsTrigger value="pending" className="px-4 py-2">
-              Pending ({pendingCount})
+              {t('adminRequests.tabs.pending', {count: pendingCount})}
             </TabsTrigger>
             <TabsTrigger value="approved" className="px-4 py-2">
-              Approved ({approvedCount})
+              {t('adminRequests.tabs.approved', {count: approvedCount})}
             </TabsTrigger>
             <TabsTrigger value="rejected" className="px-4 py-2">
-              Rejected ({rejectedCount})
+              {t('adminRequests.tabs.rejected', {count: rejectedCount})}
             </TabsTrigger>
             <TabsTrigger value="fulfilled" className="px-4 py-2">
-              Fulfilled ({fulfilledCount})
+              {t('adminRequests.tabs.fulfilled', {count: fulfilledCount})}
             </TabsTrigger>
           </TabsList>
           
@@ -167,7 +169,7 @@ const AdminRequests = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by employee or supply name..."
+                placeholder={t('adminRequests.searchPlaceholder')}
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -180,10 +182,10 @@ const AdminRequests = () => {
                 onValueChange={(value) => handleFilterChange("department", value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Filter by department" />
+                  <SelectValue placeholder={t('adminRequests.filterByDepartment')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
+                  <SelectItem value="all">{t('adminRequests.allDepartments')}</SelectItem>
                   {departments.map(dept => (
                     <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
                   ))}
@@ -192,7 +194,7 @@ const AdminRequests = () => {
             </div>
             
             <Button variant="outline" onClick={clearFilters}>
-              Clear Filters
+              {t('adminRequests.clearFilters')}
             </Button>
           </div>
           

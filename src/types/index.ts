@@ -4,6 +4,7 @@ export type Equipment = {
   category: string;
   description: string;
   image: string;
+  available: number;
 };
 
 export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'fulfilled' | 'cancelled';

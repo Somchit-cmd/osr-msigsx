@@ -5,10 +5,12 @@ import RequestTable from "@/components/RequestTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { subscribeToUserRequests } from "@/lib/requestService";
 import Pagination from "@/components/Pagination";
+import { useTranslation } from 'react-i18next';
 
 const PAGE_SIZE = 10;
 
 const MyRequests = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("all");
   const [myRequests, setMyRequests] = useState([]);
   const [user, setUser] = useState(() =>
@@ -89,15 +91,15 @@ const MyRequests = () => {
     <div className="min-h-screen flex flex-col">
       <Header user={user} />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">My Requests</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('myRequests.title')}</h1>
         
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-4">
-            <TabsTrigger value="all">All ({myRequests.length})</TabsTrigger>
-            <TabsTrigger value="pending">Pending ({pendingCount})</TabsTrigger>
-            <TabsTrigger value="approved">Approved ({approvedCount})</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected ({rejectedCount})</TabsTrigger>
-            <TabsTrigger value="fulfilled">Fulfilled ({fulfilledCount})</TabsTrigger>
+            <TabsTrigger value="all">{t('myRequests.all', {count: myRequests.length})}</TabsTrigger>
+            <TabsTrigger value="pending">{t('myRequests.pending', {count: pendingCount})}</TabsTrigger>
+            <TabsTrigger value="approved">{t('myRequests.approved', {count: approvedCount})}</TabsTrigger>
+            <TabsTrigger value="rejected">{t('myRequests.rejected', {count: rejectedCount})}</TabsTrigger>
+            <TabsTrigger value="fulfilled">{t('myRequests.fulfilled', {count: fulfilledCount})}</TabsTrigger>
           </TabsList>
           
           <TabsContent value={activeTab}>

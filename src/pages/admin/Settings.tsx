@@ -11,8 +11,10 @@ import EditCategoryDialog from "@/components/EditCategoryDialog";
 import RemoveCategoryDialog from "@/components/RemoveCategoryDialog";
 import { subscribeToAllUsers, addUser, editUser, removeUser } from "@/lib/userService";
 import { subscribeToCategories, addCategory, editCategory, removeCategory } from "@/lib/categoryService";
+import { useTranslation } from 'react-i18next';
 
 export default function AdminSettings() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
@@ -86,24 +88,24 @@ export default function AdminSettings() {
           <CardHeader className="flex flex-row items-center justify-between bg-gray-50 rounded-t-xl px-6 py-4">
             <div className="flex items-center gap-2">
               <span className="text-xl">👤</span>
-              <CardTitle className="text-lg font-semibold">User Management</CardTitle>
+              <CardTitle className="text-lg font-semibold">{t('settings.userManagement')}</CardTitle>
             </div>
             <Button
               className="bg-brand-blue text-white hover:bg-brand-blue/90 rounded-md px-4 py-2"
               onClick={() => setIsAddUserDialogOpen(true)}
             >
-              + Add User
+              + {t('settings.addUser')}
             </Button>
           </CardHeader>
           <CardContent className="px-6 py-4">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="p-3 text-left font-medium rounded-tl-xl">Username</th>
-                  <th className="p-3 text-left font-medium">Name</th>
-                  <th className="p-3 text-left font-medium">Department</th>
-                  <th className="p-3 text-left font-medium">Role</th>
-                  <th className="p-3 text-left font-medium rounded-tr-xl">Actions</th>
+                  <th className="p-3 text-left font-medium rounded-tl-xl">{t('settings.username')}</th>
+                  <th className="p-3 text-left font-medium">{t('settings.name')}</th>
+                  <th className="p-3 text-left font-medium">{t('settings.department')}</th>
+                  <th className="p-3 text-left font-medium">{t('settings.role')}</th>
+                  <th className="p-3 text-left font-medium rounded-tr-xl">{t('settings.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,14 +121,14 @@ export default function AdminSettings() {
                         className="mr-2 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                         onClick={() => { setSelectedUser(user); setIsEditUserDialogOpen(true); }}
                       >
-                        Edit
+                        {t('common.edit')}
                       </Button>
                       <Button
                         size="sm"
                         className="mr-2 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
                         onClick={() => { setSelectedUser(user); setIsRemoveUserDialogOpen(true); }}
                       >
-                        Remove
+                        {t('common.remove')}
                       </Button>
                     </td>
                   </tr>
@@ -141,21 +143,21 @@ export default function AdminSettings() {
           <CardHeader className="flex flex-row items-center justify-between bg-gray-50 rounded-t-xl px-6 py-4">
             <div className="flex items-center gap-2">
               <span className="text-xl">📦</span>
-              <CardTitle className="text-lg font-semibold">Inventory Management</CardTitle>
+              <CardTitle className="text-lg font-semibold">{t('settings.inventoryManagement')}</CardTitle>
             </div>
             <Button
               className="bg-brand-blue text-white hover:bg-brand-blue/90 rounded-md px-4 py-2"
               onClick={() => setIsAddCategoryDialogOpen(true)}
             >
-              + Add Category
+              + {t('settings.addCategory')}
             </Button>
           </CardHeader>
           <CardContent className="px-6 py-4">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="p-3 text-left font-medium rounded-tl-xl">Category Name</th>
-                  <th className="p-3 text-left font-medium rounded-tr-xl">Actions</th>
+                  <th className="p-3 text-left font-medium rounded-tl-xl">{t('settings.categoryName')}</th>
+                  <th className="p-3 text-left font-medium rounded-tr-xl">{t('settings.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,14 +170,14 @@ export default function AdminSettings() {
                         className="mr-2 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                         onClick={() => { setSelectedCategory(cat); setIsEditCategoryDialogOpen(true); }}
                       >
-                        Edit
+                        {t('common.edit')}
                       </Button>
                       <Button
                         size="sm"
                         className="bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
                         onClick={() => { setSelectedCategory(cat); setIsRemoveCategoryDialogOpen(true); }}
                       >
-                        Remove
+                        {t('common.remove')}
                       </Button>
                     </td>
                   </tr>

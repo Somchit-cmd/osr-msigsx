@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 type AddCategoryDialogProps = {
   open: boolean;
@@ -21,6 +22,7 @@ export default function AddCategoryDialog({
   onOpenChange,
   onAddCategory,
 }: AddCategoryDialogProps) {
+  const { t } = useTranslation();
   const [category, setCategory] = useState("");
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function AddCategoryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Add Category</DialogTitle>
+          <DialogTitle>{t('addCategory.title')}</DialogTitle>
         </DialogHeader>
         <form
           className="space-y-2"
@@ -43,7 +45,7 @@ export default function AddCategoryDialog({
         >
           <div className="space-y-4">
             <Label htmlFor="category-name" className="mb-2">
-              Category Name
+              {t('addCategory.categoryName')}
             </Label>
             <Input
               id="category-name"
@@ -58,10 +60,10 @@ export default function AddCategoryDialog({
                 type="button"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={!category}>
-                Add Category
+                {t('addCategory.add')}
               </Button>
             </DialogFooter>
           </div>

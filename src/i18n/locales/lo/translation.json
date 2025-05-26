@@ -1,0 +1,321 @@
+{
+  "header": {
+    "manageSupplies": "ຄຸ້ມຄອງອຸປະກອນຫ້ອງການ",
+    "manageSuppliesDesc": "ຄຸ້ມຄອງອຸປະກອນ ແລະ ລະດັບສິນຄ້າ",
+    "equipment": "ອຸປະກອນ",
+    "myRequests": "ຄຳຂໍຂອງຂ້ອຍ",
+    "dashboard": "ໜ້າຄວບຄຸມ",
+    "requests": "ຄຳຮ້ອງຂໍ",
+    "inventory": "ອຸປະກອນ",
+    "reports": "ລາຍງານ",
+    "settings": "ຕັ້ງຄ່າ",
+    "logout": "ອອກຈາກລະບົບ"
+  },
+  "buttons": {
+    "addNew": "ເພີ່ມລາຍການໃໝ່",
+    "cancel": "ຍົກເລີກ",
+    "save": "ບັນທຶກການປ່ຽນແປງ",
+    "delete": "ລົບອຸປະກອນ",
+    "confirm": "ຢືນຢັນ"
+  },
+  "inventory": {
+    "title": "ຈັດການອຸປະກອນຫ້ອງການ",
+    "description": "ຈັດການອຸປະກອນ ແລະ ລະດັບສິນຄ້າ",
+    "addNewItem": "ເພີ່ມລາຍການໃໝ່",
+    "searchPlaceholder": "ຄົ້ນຫາອຸປະກອນ...",
+    "noItems": "ບໍ່ພົບລາຍການທີ່ກົງກັບເງື່ອນໄຂຂອງທ່ານ",
+    "deleteEquipment": "ລົບອຸປະກອນ",
+    "saveChanges": "ບັນທຶກການປ່ຽນແປງ",
+    "addStock": "ເພີ່ມສະຕັອກ",
+    "removeStock": "ລົບສະຕັອກ",
+    "addStockDescription": "ເພີ່ມຫົວໜ່ວຍເຂົ້າໃນສິນຄ້າຄົງຄັງ {{name}}.",
+    "removeStockDescription": "ຖອນຫົວໜ່ວຍອອກຈາກສິນຄ້າຄົງຄັງ {{name}}.",
+    "quantity": "ຈຳນວນ",
+    "notes": "ໝາຍເຫດ (ເລືອກໄດ້)",
+    "notesPlaceholder": "ເຫດຜົນສຳລັບການປັບປຸງນີ້...",
+    "confirmDelete": "ຢືນຢັນການລົບ",
+    "confirmDeleteDescription": "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລົບ {{name}}? ການກະທຳນີ້ບໍ່ສາມາດເອົາຄືນໄດ້.",
+    "delete": "ລົບ",
+    "image": "ຮູບພາບ (ເລືອກໄດ້)",
+    "allItems": "ທຸກລາຍການ",
+    "item": "ລາຍການ",
+    "category": "ໝວດໝູ່",
+    "available": "ຍັງເຫຼືອ",
+    "maxStock": "ສິນຄ້າສູງສຸດ",
+    "status": "ສະຖານະ",
+    "actions": "ການດຳເນີນການ",
+    "outOfStock": "ໝົດສະຕັອກ",
+    "lowStock": "ສະຕັອກຕ່ຳ",
+    "inStock": "ມີໃນສະຕັອກ",
+    "addNew": {
+      "title": "ເພີ່ມອຸປະກອນໃໝ່",
+      "description": "ເພີ່ມລາຍການອຸປະກອນໃໝ່ເຂົ້າໃນສິນຄ້າຄົງຄັງ.",
+      "equipmentName": "ຊື່ອຸປະກອນ",
+      "namePlaceholder": "ຊື່ລາຍການ",
+      "category": "ໝວດໝູ່",
+      "selectCategory": "ເລືອກໝວດໝູ່",
+      "descriptionPlaceholder": "ຄຳອະທິບາຍໂດຍຫຍໍ້ກ່ຽວກັບອຸປະກອນ...",
+      "available": "ຍັງເຫຼືອ",
+      "totalStock": "ສະຕັອກທັງໝົດ",
+      "minQuantity": "ຈຳນວນຂັ້ນຕ່ຳ",
+      "image": "ຮູບພາບ (ເລືອກໄດ້)",
+      "preview": "ຕົວຢ່າງ",
+      "addItem": "ເພີ່ມລາຍການ"
+    },
+    "editEquipment": "ແກ້ໄຂອຸປະກອນ",
+    "editEquipmentDescription": "ອັບເດດຂໍ້ມູນ ແລະ ການຕັ້ງຄ່າອຸປະກອນ",
+    "name": "ຊື່ອຸປະກອນ",
+    "chooseFile": "ເລືອກໄຟລ໌",
+    "noFileChosen": "ບໍ່ມີໄຟລ໌ທີ່ເລືອກ",
+    "totalStock": "ຈຳນວນສິນຄ້າທັງໝົດ",
+    "minQuantity": "ຈຳນວນຂັ້ນຕ່ຳ",
+    "selectCategory": "ເລືອກໝວດໝູ່",
+    "table": {
+      "item": "ລາຍການ",
+      "category": "ໝວດໝູ່",
+      "available": "ມີໃຫ້",
+      "maxStock": "ສະຕັອກສູງສຸດ",
+      "status": "ສະຖານະ",
+      "actions": "ການດຳເນີນການ"
+    }
+  },
+  "homepage": {
+    "title": "ອຸປະກອນຫ້ອງການທີ່ສາມາດເບີກໄດ້",
+    "subtitle": "ຊອກຫາ ແລະ ຂໍເບີກອຸປະກອນຕາມຄວາມຕ້ອງການຂອງທ່ານ",
+    "searchPlaceholder": "ຊອກຫາອຸປະກອນ...",
+    "noResults": "ບໍ່ພົບອຸປະກອນທີ່ກົງກັບເງື່ອນໄຂຂອງທ່ານ.",
+    "requestNow": "ຂໍເບີກສີ່ງນີ້"
+  },
+  "equipment": {
+    "available": "ຍັງເຫຼືອ {{count}}",
+    "outOfStock": "ໝົດສະຕັອກ"
+  },
+  "categories": {
+    "allItems": "ທຸກລາຍການ",
+    "writing": "ການຂຽນ",
+    "desktools": "ເຄື່ອງມືໂຕະ",
+    "paper": "ເຈ້ຍ",
+    "electronics": "ເຄື່ອງອີເລັກໂຕຣນິກ",
+    "tapes&glue": "ສະກ໊ອດ & ກາວ",
+    "binding": "ປະເພດເຂົ້າເຫຼັ້ມ"
+  },
+  "requestForm": {
+    "title": "ຂໍເບີກອຸປະກອນຫ້ອງການ",
+    "description": "ຕື່ມຂໍ້ມູນເພື່ອຂໍ {{name}}. ທ່ານຈະໄດ້ຮັບການແຈ້ງເຕືອນເມື່ອຄຳຂໍຂອງທ່ານໄດ້ຮັບການດຳເນີນການ.",
+    "fullName": "ຊື່ເຕັມ",
+    "department": "ພະແນກ",
+    "officeSupply": "ອຸປະກອນຫ້ອງການ",
+    "quantity": "ຈຳນວນ",
+    "notes": "ໝາຍເຫດ",
+    "notesPlaceholder": "ລະບຸລາຍລະອຽດກ່ຽວກັບຄຳຂໍຂອງທ່ານ...",
+    "submit": "ສົ່ງຄຳຂໍ",
+    "available": "ຍັງເຫຼືອ {{count}}"
+  },
+  "common": {
+    "cancel": "ຍົກເລີກ",
+    "edit": "ແກ້ໄຂ",
+    "remove": "ລົບ"
+  },
+  "myRequests": {
+    "title": "ຄຳຂໍຂອງຂ້ອຍ",
+    "all": "ທັງໝົດ ({{count}})",
+    "pending": "ກຳລັງລໍຖ້າ ({{count}})",
+    "approved": "ອະນຸມັດແລ້ວ ({{count}})",
+    "rejected": "ຖືກປະຕິເສດ ({{count}})",
+    "fulfilled": "ສົ່ງມອບແລ້ວ ({{count}})"
+  },
+  "requestTable": {
+    "equipment": "ອຸປະກອນ",
+    "employee": "ພະນັກງານ",
+    "department": "ພະແນກ",
+    "quantity": "ຈຳນວນ",
+    "requestDate": "ວັນທີຂໍ",
+    "approveDate": "ວັນທີອະນຸມັດ",
+    "fulfilledDate": "ວັນທີສົ່ງມອບ",
+    "status": "ສະຖານະ",
+    "actions": "ການດຳເນີນການ",
+    "noRequests": "ບໍ່ພົບຄຳຂໍ",
+    "hide": "ເຊື່ອງ",
+    "details": "ລາຍລະອຽດ",
+    "approve": "ອະນຸມັດ",
+    "reject": "ປະຕິເສດ",
+    "fulfill": "ສົ່ງມອບສຳເລັດ",
+    "cancel": "ຍົກເລີກ",
+    "requestNotes": "ໝາຍເຫດຄຳຂໍ",
+    "adminNotes": "ໝາຍເຫດຈາກແອັດມິນ",
+    "rejectRequest": "ປະຕິເສດຄຳຂໍ",
+    "rejectReasonPlaceholder": "ປ້ອນເຫດຜົນສຳລັບການປະຕິເສດ (ເລືອກໄດ້)",
+    "confirmReject": "ຢືນຢັນການປະຕິເສດ",
+    "statuses": {
+      "pending": "ລໍຖ້າ",
+      "approved": "ອະນຸມັດແລ້ວ",
+      "rejected": "ປະຕິເສດ",
+      "fulfilled": "ສົ່ງມອບແລ້ວ",
+      "cancelled": "ຍົກເລີກ"
+    }
+  },
+  "logout": {
+    "title": "ຢືນຢັນການອອກຈາກລະບົບ",
+    "message": "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການອອກຈາກລະບົບ?",
+    "confirm": "ອອກຈາກລະບົບ"
+  },
+  "pagination": {
+    "prev": "ກັບຄືນ",
+    "next": "ຕໍ່ໄປ"
+  },
+  "notifications": {
+    "title": "ການແຈ້ງເຕືອນ",
+    "markAllRead": "ໝາຍທັງໝົດວ່າອ່ານແລ້ວ",
+    "noUnread": "ບໍ່ມີການແຈ້ງເຕືອນທີ່ຍັງບໍ່ໄດ້ອ່ານ"
+  },
+  "login": {
+    "welcomeTitle": "ຍິນດີຕ້ອນຮັບເຂົ້າສູ່ MSIGSX OSR",
+    "welcomeDescription": "ກະລຸນາລົງຊື່ເຂົ້າໃຊ້ດ້ວຍຂໍ້ມູນພະນັກງານຂອງທ່ານເພື່ອດຳເນີນການຕໍ່.",
+    "employeeId": "ລະຫັດພະນັກງານ",
+    "employeeIdPlaceholder": "ໝາຍເລກລະຫັດພະນັກງານຂອງທ່ານ",
+    "password": "ລະຫັດຜ່ານ",
+    "passwordPlaceholder": "ລະຫັດພະນັກງານຂອງທ່ານອີກຄັ້ງ",
+    "rememberMe": "ຈົດຈຳຂ້ອຍ",
+    "login": "ເຂົ້າສູ່ລະບົບ",
+    "loggingIn": "ກຳລັງເຂົ້າສູ່ລະບົບ...",
+    "successTitle": "ເຂົ້າສູ່ລະບົບສຳເລັດ",
+    "successMessage": "ຍິນດີຕ້ອນຮັບ, {{name}}!",
+    "failedTitle": "ເຂົ້າສູ່ລະບົບລົ້ມເຫຼວ",
+    "invalidPassword": "ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ",
+    "userNotFound": "ບໍ່ພົບຜູ້ໃຊ້",
+    "logoAlt": "ໂລໂກ້ບໍລິສັດ"
+  },
+  "adminDashboard": {
+    "title": "ໜ້າຄວບຄຸມຜູ້ດູແລລະບົບ",
+    "overview": "ພາບລວມຂອງຄຳຂໍອຸປະກອນຫ້ອງການ ແລະ ສິນຄ້າຍັງເຫຼືອ",
+    "requestsToday": "ຄຳຂໍມື້ນີ້",
+    "requestsThisWeek": "ຄຳຂໍອາທິດນີ້",
+    "pendingApprovals": "ລໍຖ້າການອະນຸມັດ",
+    "lowStockItems": "ສິນຄ້າໃກ້ໝົດ / ໝົດສະຕັອກ",
+    "lowStockAlert": {
+      "title": "ແຈ້ງເຕືອນສິນຄ້າໃກ້ໝົດ",
+      "description": "ອຸປະກອນຫ້ອງການທີ່ຕ້ອງການເຕີມສະຕັອກ",
+      "sufficientStock": "ທຸກລາຍການມີສິນຄ້າພຽງພໍ"
+    },
+    "recentRequests": {
+      "title": "ຄຳຂໍຫຼ້າສຸດ",
+      "description": "ຄຳຂໍອຸປະກອນຫຼ້າສຸດທີ່ຕ້ອງການການອະນຸມັດ"
+    }
+  },
+  "requestActions": {
+    "approvedTitle": "ຄຳຂໍອະນຸມັດແລ້ວ",
+    "approvedDescription": "ຄຳຂໍອຸປະກອນ #{{id}} ການອະນຸມັດແລ້ວສຳເລັດ",
+    "rejectedTitle": "ຄຳຂໍຖືກປະຕິເສດ",
+    "rejectedDescription": "ຄຳຂໍອຸປະກອນ #{{id}} ຖືກປະຕິເສດສຳເລັດ",
+    "fulfilledTitle": "ຄຳຂໍສົ່ງມອບແລ້ວ",
+    "fulfilledDescription": "ຄຳຂໍອຸປະກອນ #{{id}} ສົ່ງມອບແລ້ວສຳເລັດ"
+  },
+  "adminRequests": {
+    "title": "ຈັດການຄຳຂໍອຸປະກອນ",
+    "description": "ກວດສອບ ແລະ ດຳເນີນການກັບຄຳຂໍອຸປະກອນຫ້ອງການ",
+    "tabs": {
+      "all": "ທັງໝົດ ({{count}})",
+      "pending": "ກຳລັງລໍຖ້າ ({{count}})",
+      "approved": "ອະນຸມັດແລ້ວ ({{count}})",
+      "rejected": "ປະຕິເສດ ({{count}})",
+      "fulfilled": "ສົ່ງມອບແລ້ວ ({{count}})"
+    },
+    "searchPlaceholder": "ຄົ້ນຫາຕາມຊື່ພະນັກງານ ຫຼື ຊື່ອຸປະກອນ...",
+    "filterByDepartment": "ກັ່ນຕອງຕາມພະແນກ",
+    "allDepartments": "ທຸກພະແນກ",
+    "clearFilters": "ລ້າງການກັ່ນຕອງ",
+    "actions": {
+      "approvedTitle": "ຄຳຂໍໄດ້ຮັບການອະນຸມັດ",
+      "approvedDescription": "ຄຳຂໍ #{{id}} ໄດ້ຮັບການອະນຸມັດຢ່າງສຳເລັດ.",
+      "rejectedTitle": "ຄຳຂໍໄດ້ຮັບການປະຕິເສດ",
+      "rejectedDescription": "ຄຳຂໍ #{{id}} ໄດ້ຮັບການປະຕິເສດຢ່າງສຳເລັດ.",
+      "fulfilledTitle": "ຄຳຂໍໄດ້ຮັບການຕອບສະໜອງ",
+      "fulfilledDescription": "ຄຳຂໍ #{{id}} ໄດ້ຮັບການຕອບສະໜອງຢ່າງສຳເລັດ."
+    }
+  },
+  "reports": {
+    "title": "ລາຍງານ ແລະ ການວິເຄາະ",
+    "description": "ສ້າງ ແລະ ສົ່ງອອກລາຍງານການເບີກອຸປະກອນ",
+    "periods": {
+      "daily": "ປະຈໍາວັນ",
+      "weekly": "ລາຍອາທິດ",
+      "monthly": "ລາຍເດືອນ",
+      "custom": "ກໍານົດເອງ"
+    },
+    "exportReport": "ສົ່ງອອກລາຍງານ",
+    "startDate": "ວັນທີເລີ່ມຕົ້ນ",
+    "endDate": "ວັນທີສິ້ນສຸດ",
+    "department": "ພະແນກ",
+    "allDepartments": "ທຸກພະແນກ",
+    "totalRequests": "ຄຳຂໍທັງໝົດ",
+    "approvedFulfilled": "ອະນຸມັດ/ສຳເລັດ",
+    "pending": "ລໍຖ້າ",
+    "rejected": "ປະຕິເສດ",
+    "byDepartment": {
+      "title": "ຄຳຂໍຕາມພະແນກ",
+      "description": "ການກະຈາຍຂອງຄຳຂໍອຸປະກອນຕາມພະແນກ"
+    },
+    "byStatus": {
+      "title": "ຄຳຂໍຕາມສະຖານະ",
+      "description": "ການແຍກຄຳຂໍຕາມສະຖານະ"
+    },
+    "noData": "ບໍ່ມີຂໍ້ມູນທີ່ຈະສະແດງ",
+    "detailedData": "ຂໍ້ມູນຄຳຂໍລະອຽດ",
+    "table": {
+      "requestDate": "ວັນທີຂໍ",
+      "employee": "ພະນັກງານ",
+      "department": "ພະແນກ",
+      "equipment": "ອຸປະກອນ",
+      "quantity": "ຈຳນວນ",
+      "notes": "ໝາຍເຫດ",
+      "status": "ສະຖານະ",
+      "approvalDate": "ວັນທີອະນຸມັດ",
+      "fulfillmentDate": "ວັນທີສຳເລັດ",
+      "adminNotes": "ໝາຍເຫດຜູ້ບໍລິຫານ"
+    },
+    "statuses": {
+      "pending": "ລໍຖ້າ",
+      "approved": "ອະນຸມັດແລ້ວ",
+      "rejected": "ປະຕິເສດ",
+      "fulfilled": "ສຳເລັດແລ້ວ",
+      "cancelled": "ຢົກເລີກ"
+    },
+    "noDataToExport": "ບໍ່ມີຂໍ້ມູນທີ່ຈະສົ່ງອອກ",
+    "noDataForFilters": "ບໍ່ມີຂໍ້ມູນສຳລັບການກັ່ນຕອງທີ່ເລືອກ",
+    "reportExported": "ສົ່ງອອກລາຍງານແລ້ວ",
+    "exportSuccess": "ລາຍງານສຳລັບກິດຈະກຳ{{period}}ໄດ້ຖືກສົ່ງອອກຢ່າງສຳເລັດ."
+  },
+  "settings": {
+    "userManagement": "ການຈັດການຜູ້ໃຊ້",
+    "inventoryManagement": "ການຈັດການສິນຄ້າ",
+    "addUser": "ເພີ່ມຜູ້ໃຊ້",
+    "username": "ລະຫັດຜູ້ໃຊ້",
+    "name": "ຊື່ ແລະ ນາມສະກຸນ",
+    "department": "ພະແນກ",
+    "role": "ບົດບາດ",
+    "actions": "ໝາຍເຫດ",
+    "addCategory": "ເພີ່ມໝວດໝູ່",
+    "categoryName": "ຊື່ໝວດໝູ່"
+  },
+  "addUser": {
+    "title": "ເພີ່ມຜູ້ໃຊ້ໃໝ່",
+    "personalInfo": "ຂໍ້ມູນສ່ວນຕົວ",
+    "firstName": "ຊື່",
+    "lastName": "ນາມສະກຸນ",
+    "department": "ພະແນກ",
+    "selectDepartment": "ເລືອກພະແນກ",
+    "accountInfo": "ຂໍ້ມູນບັນຊີ",
+    "userId": "ລະຫັດຜູ້ໃຊ້",
+    "email": "ອີເມວ",
+    "password": "ລະຫັດຜ່ານ",
+    "role": "ບົດບາດ",
+    "employee": "ພະນັກງານ",
+    "admin": "ຜູ້ດູແລລະບົບ",
+    "addUser": "ເພີ່ມຜູ້ໃຊ້"
+  },
+  "addCategory": {
+    "title": "ເພີ່ມໝວດໝູ່",
+    "categoryName": "ຊື່ໝວດໝູ່",
+    "add": "ເພີ່ມໝວດໝູ່"
+  }
+}

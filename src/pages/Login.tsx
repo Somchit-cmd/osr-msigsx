@@ -16,8 +16,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import logo from "@/assets/logo-png-only.webp";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const Login = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [employeeId, setEmployeeId] = useState("");
@@ -26,6 +29,11 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  // Add a specific style for the login page based on language
+  const laoFontStyle = i18n.language === 'lo' ? {
+    fontFamily: "'Noto Sans Lao', system-ui, sans-serif"
+  } : {};
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +53,8 @@ const Login = () => {
           sessionStorage.setItem("user", JSON.stringify(userData));
         }
         toast({
-          title: "Login successful",
-          description: `Welcome, ${userData.name} ${userData.surname}!`,
+          title: t('login.successTitle'),
+          description: t('login.successMessage', {name: `${userData.name} ${userData.surname}`}),
         });
         // Redirect based on role
         if (userData.role === "admin") {
@@ -56,45 +64,45 @@ const Login = () => {
         }
       } else {
         toast({
-          title: "Login failed",
-          description: "Invalid password",
+          title: t('login.failedTitle'),
+          description: t('login.invalidPassword'),
           variant: "destructive",
         });
-        setError("Invalid password");
+        setError(t('login.invalidPassword'));
       }
     } else {
       toast({
-        title: "Login failed",
-        description: "User not found",
+        title: t('login.failedTitle'),
+        description: t('login.userNotFound'),
         variant: "destructive",
       });
-      setError("User not found");
+      setError(t('login.userNotFound'));
     }
     setIsSubmitting(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-gray p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-brand-gray p-4 relative">
+      <Card className="w-full max-w-md" style={laoFontStyle}>
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-6">
-            <img src={logo} alt="Company Logo" className="w-20 h-20 object-contain" />
+            <img src={logo} alt={t('login.logoAlt')} className="w-20 h-20 object-contain" />
           </div>
           <CardTitle className="text-xl font-bold text-center text-brand-blue mb-2">
-            Welcome to MSIGSX OSR
+            {t('login.welcomeTitle')}
           </CardTitle>
           <CardDescription className="text-center text-gray-500 mb-4">
-            Please sign in with your staff credentials to continue.
+            {t('login.welcomeDescription')}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="employeeId">Employee ID</Label>
+              <Label htmlFor="employeeId">{t('login.employeeId')}</Label>
               <Input
                 id="employeeId"
                 type="text"
-                placeholder="Your staff id number"
+                placeholder={t('login.employeeIdPlaceholder')}
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 required
@@ -102,7 +110,7 @@ const Login = () => {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('login.password')}</Label>
               </div>
               <div className="relative">
                 <Input
@@ -110,7 +118,7 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Repeat your staff id number"
+                  placeholder={t('login.passwordPlaceholder')}
                   required
                 />
                 <button
@@ -133,7 +141,7 @@ const Login = () => {
                 htmlFor="remember"
                 className="text-sm font-medium leading-none cursor-pointer"
               >
-                Remember me
+                {t('login.rememberMe')}
               </label>
             </div>
           </CardContent>
@@ -143,12 +151,17 @@ const Login = () => {
               className="w-full bg-brand-blue hover:bg-brand-blue/90"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Logging in..." : "Log in"}
+              {isSubmitting ? t('login.loggingIn') : t('login.login')}
             </Button>
           </CardFooter>
         </form>
         {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
       </Card>
+      
+      {/* Language switcher positioned at bottom right */}
+      <div className="fixed top-4 right-4">
+        <LanguageSwitcher />
+      </div>
     </div>
   );
 };
