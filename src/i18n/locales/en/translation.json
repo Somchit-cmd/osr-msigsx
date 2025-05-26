@@ -316,5 +316,8 @@
     "title": "Add Category",
     "categoryName": "Category Name",
     "add": "Add Category"
+  },
+  "footer": {
+    "copyright": "Office Supplies Request System. MSIG-Sokxay Insurance Co., Ltd. All rights reserved."
   }
 }
