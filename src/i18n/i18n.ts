@@ -24,6 +24,14 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+  }).then(() => {
+    // Set the lang attribute immediately after initialization
+    document.documentElement.setAttribute('lang', i18n.language);
   });
+
+// Add listener for language changes
+i18n.on('languageChanged', (lng) => {
+  document.documentElement.setAttribute('lang', lng);
+});
 
 export default i18n;

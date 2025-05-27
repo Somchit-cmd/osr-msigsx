@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Index from "./pages/Index";
@@ -15,37 +17,48 @@ import AdminSettings from "./pages/admin/Settings";
 import InitializeDB from "./pages/admin/InitializeDB";
 import NotFound from "./pages/NotFound";
 
-
 const queryClient = new QueryClient();
 
-
+// Create a language wrapper component
+const LanguageWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { i18n } = useTranslation();
+  
+  // Ensure lang attribute is set on language change
+  useEffect(() => {
+    document.documentElement.setAttribute('lang', i18n.language);
+  }, [i18n.language]);
+  
+  return <>{children}</>;
+};
 
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            
-            {/* Protected routes for general users */}
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/my-requests" element={<ProtectedRoute><MyRequests /></ProtectedRoute>} />
-            
-            {/* Protected routes for admin users */}
-            <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/requests" element={<ProtectedRoute allowedRoles={["admin"]}><AdminRequests /></ProtectedRoute>} />
-            <Route path="/admin/inventory" element={<ProtectedRoute allowedRoles={["admin"]}><AdminInventory /></ProtectedRoute>} />
-            <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={["admin"]}><AdminReports /></ProtectedRoute>} />
-            <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />
-            <Route path="/admin/initialize-db" element={<ProtectedRoute allowedRoles={["admin"]}><InitializeDB /></ProtectedRoute>} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <LanguageWrapper>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              
+              {/* Protected routes for general users */}
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/my-requests" element={<ProtectedRoute><MyRequests /></ProtectedRoute>} />
+              
+              {/* Protected routes for admin users */}
+              <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/requests" element={<ProtectedRoute allowedRoles={["admin"]}><AdminRequests /></ProtectedRoute>} />
+              <Route path="/admin/inventory" element={<ProtectedRoute allowedRoles={["admin"]}><AdminInventory /></ProtectedRoute>} />
+              <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={["admin"]}><AdminReports /></ProtectedRoute>} />
+              <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />
+              <Route path="/admin/initialize-db" element={<ProtectedRoute allowedRoles={["admin"]}><InitializeDB /></ProtectedRoute>} />
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </LanguageWrapper>
       </TooltipProvider>
     </QueryClientProvider>
   );
