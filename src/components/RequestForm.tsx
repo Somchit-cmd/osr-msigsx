@@ -12,14 +12,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { departments, employees } from "@/data/mockData";
 import { Equipment, InventoryItem } from "@/types";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 interface RequestFormProps {
   isOpen: boolean;
@@ -61,7 +67,7 @@ export default function RequestForm({
   }, [isOpen]);
 
   const handleChange = (field: string, value: string | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -72,9 +78,7 @@ export default function RequestForm({
       const user =
         JSON.parse(sessionStorage.getItem("user") || "null") ||
         JSON.parse(localStorage.getItem("user") || "null");
-      
-      console.log("Creating request with user:", user); // Debug log
-      
+
       if (!user || !user.id) {
         throw new Error("No user ID found");
       }
@@ -91,10 +95,7 @@ export default function RequestForm({
         updatedAt: Timestamp.now(),
       };
 
-      console.log("Submitting request with data:", requestData); // Debug log
-
       const docRef = await addDoc(collection(db, "requests"), requestData);
-      console.log("Request created with ID:", docRef.id); // Debug log
 
       await addDoc(collection(db, "notifications"), {
         userId: "admin",
@@ -103,10 +104,10 @@ export default function RequestForm({
         message: "notificationMessages.newRequest",
         messageParams: {
           id: docRef.id,
-          name: `${user.name} ${user.surname}`
+          name: `${user.name} ${user.surname}`,
         },
         read: false,
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       });
 
       toast({
@@ -114,10 +115,10 @@ export default function RequestForm({
         description: `Your request for ${formData.quantity} ${formData.equipmentName}(s) is being processed.`,
       });
     } catch (error) {
-      console.error("Error creating request:", error); // Debug log
       toast({
         title: "Error submitting request",
-        description: "There was a problem submitting your request. Please try again.",
+        description:
+          "There was a problem submitting your request. Please try again.",
         variant: "destructive",
       });
     }
@@ -125,9 +126,9 @@ export default function RequestForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!equipment) return;
-    
+
     if (formData.quantity > equipment.available) {
       toast({
         title: "Invalid quantity",
@@ -136,19 +137,19 @@ export default function RequestForm({
       });
       return;
     }
-    
+
     onSubmit({
       ...formData,
       equipmentId: equipment.id,
       equipmentName: equipment.name,
     });
-    
+
     handleRequestSubmit({
       ...formData,
       equipmentId: equipment.id,
       equipmentName: equipment.name,
     });
-    
+
     onClose();
   };
 
@@ -156,15 +157,15 @@ export default function RequestForm({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{t('requestForm.title')}</DialogTitle>
+          <DialogTitle>{t("requestForm.title")}</DialogTitle>
           <DialogDescription>
-            {t('requestForm.description', { name: equipment?.name })}
+            {t("requestForm.description", { name: equipment?.name })}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="employeeName">{t('requestForm.fullName')}</Label>
+              <Label htmlFor="employeeName">{t("requestForm.fullName")}</Label>
               <Input
                 id="employeeName"
                 value={formData.employeeName}
@@ -172,9 +173,9 @@ export default function RequestForm({
                 className="bg-gray-50"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="department">{t('requestForm.department')}</Label>
+              <Label htmlFor="department">{t("requestForm.department")}</Label>
               <Input
                 id="department"
                 value={formData.department}
@@ -183,9 +184,9 @@ export default function RequestForm({
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="equipment">{t('requestForm.officeSupply')}</Label>
+            <Label htmlFor="equipment">{t("requestForm.officeSupply")}</Label>
             <Input
               id="equipment"
               value={equipment?.name || ""}
@@ -193,9 +194,9 @@ export default function RequestForm({
               className="bg-gray-50"
             />
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="quantity">{t('requestForm.quantity')}</Label>
+            <Label htmlFor="quantity">{t("requestForm.quantity")}</Label>
             <div className="flex items-center">
               <Input
                 id="quantity"
@@ -203,20 +204,24 @@ export default function RequestForm({
                 min={1}
                 max={equipment?.available || 1}
                 value={formData.quantity}
-                onChange={(e) => handleChange("quantity", parseInt(e.target.value))}
+                onChange={(e) =>
+                  handleChange("quantity", parseInt(e.target.value))
+                }
                 className="w-24"
               />
               <span className="ml-2 text-gray-500 text-sm">
-                {t('requestForm.available', { count: equipment?.available || 0 })}
+                {t("requestForm.available", {
+                  count: equipment?.available || 0,
+                })}
               </span>
             </div>
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="notes">{t('requestForm.notes')}</Label>
+            <Label htmlFor="notes">{t("requestForm.notes")}</Label>
             <Textarea
               id="notes"
-              placeholder={t('requestForm.notesPlaceholder')}
+              placeholder={t("requestForm.notesPlaceholder")}
               value={formData.notes}
               onChange={(e) => handleChange("notes", e.target.value)}
               rows={3}
@@ -225,10 +230,13 @@ export default function RequestForm({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t('common.cancel')}
+              {t("common.cancel")}
             </Button>
-            <Button type="submit" className="bg-brand-blue hover:bg-brand-blue/90">
-              {t('requestForm.submit')}
+            <Button
+              type="submit"
+              className="bg-brand-blue hover:bg-brand-blue/90"
+            >
+              {t("requestForm.submit")}
             </Button>
           </DialogFooter>
         </form>

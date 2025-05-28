@@ -20,7 +20,7 @@ export default function NotificationBell({ userId }) {
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const notifs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      console.log("Notifications for", userId, notifs);
+      
       setNotifications(notifs);
     });
     return () => unsubscribe();

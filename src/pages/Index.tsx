@@ -11,20 +11,22 @@ import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, onSnapshot } from "firebase/firestore";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All Items");
-  const [selectedEquipment, setSelectedEquipment] = useState<InventoryItem | null>(null);
+  const [selectedEquipment, setSelectedEquipment] =
+    useState<InventoryItem | null>(null);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [equipments, setEquipments] = useState<InventoryItem[]>([]);
   const navigate = useNavigate();
-  const [user, setUser] = useState(() =>
-    JSON.parse(sessionStorage.getItem("user") || "null") ||
-    JSON.parse(localStorage.getItem("user") || "null")
+  const [user, setUser] = useState(
+    () =>
+      JSON.parse(sessionStorage.getItem("user") || "null") ||
+      JSON.parse(localStorage.getItem("user") || "null")
   );
   const { t } = useTranslation();
 
@@ -38,7 +40,7 @@ const Index = () => {
     const handleStorage = () => {
       setUser(
         JSON.parse(sessionStorage.getItem("user") || "null") ||
-        JSON.parse(localStorage.getItem("user") || "null")
+          JSON.parse(localStorage.getItem("user") || "null")
       );
     };
     window.addEventListener("storage", handleStorage);
@@ -49,7 +51,7 @@ const Index = () => {
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "inventory"), (snap) => {
       setEquipments(
-        snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem))
+        snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as InventoryItem))
       );
     });
     return () => unsubscribe();
@@ -59,29 +61,30 @@ const Index = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       const snap = await getDocs(collection(db, "categories"));
-      setCategories(snap.docs.map(doc => doc.data().name)); // Adjust as needed
+      setCategories(snap.docs.map((doc) => doc.data().name)); // Adjust as needed
     };
     fetchCategories();
   }, []);
 
   // Filter equipment by category and search query
-  const filteredEquipment = equipments.filter(item => {
-    const matchesCategory = activeCategory === "All Items" || item.category === activeCategory;
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredEquipment = equipments.filter((item) => {
+    const matchesCategory =
+      activeCategory === "All Items" || item.category === activeCategory;
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-  
+
   const handleReserve = (equipmentId: string) => {
-    const equipment = equipments.find(item => item.id === equipmentId);
+    const equipment = equipments.find((item) => item.id === equipmentId);
     if (equipment) {
       setSelectedEquipment(equipment);
       setIsRequestFormOpen(true);
     }
   };
-  
+
   const handleRequestSubmit = (formData: any) => {
-    console.log("Request submitted:", formData);
     // In a real app, we would send this to an API
     // For now, just show a success message
     toast({
@@ -93,55 +96,55 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header user={user} />
-      
+
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{t('homepage.title')}</h1>
-          <p className="text-text-muted">{t('homepage.subtitle')}</p>
+          <h1 className="text-3xl font-bold mb-2">{t("homepage.title")}</h1>
+          <p className="text-text-muted">{t("homepage.subtitle")}</p>
         </div>
-        
+
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-          <CategoryFilter 
-            categories={categories} 
+          <CategoryFilter
+            categories={categories}
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
           />
-          
+
           <div className="relative w-full max-w-xs md:w-64 self-start">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={t('homepage.searchPlaceholder')}
+              placeholder={t("homepage.searchPlaceholder")}
               className="pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
-        
+
         {filteredEquipment.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-lg text-text-muted">{t('homepage.noResults')}</p>
+            <p className="text-lg text-text-muted">{t("homepage.noResults")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredEquipment.map((item) => (
-              <EquipmentCard 
-                key={item.id} 
-                equipment={item} 
-                onReserve={handleReserve} 
+              <EquipmentCard
+                key={item.id}
+                equipment={item}
+                onReserve={handleReserve}
               />
             ))}
           </div>
         )}
       </main>
-      
-      <RequestForm 
+
+      <RequestForm
         isOpen={isRequestFormOpen}
         onClose={() => setIsRequestFormOpen(false)}
         equipment={selectedEquipment}
         onSubmit={handleRequestSubmit}
       />
-      
+
       <Footer />
     </div>
   );
