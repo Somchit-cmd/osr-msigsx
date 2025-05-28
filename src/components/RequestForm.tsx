@@ -100,7 +100,11 @@ export default function RequestForm({
         userId: "admin",
         type: "new_request",
         requestId: docRef.id,
-        message: `New request #${docRef.id} submitted by ${user.name} ${user.surname}.`,
+        message: "notificationMessages.newRequest",
+        messageParams: {
+          id: docRef.id,
+          name: `${user.name} ${user.surname}`
+        },
         read: false,
         createdAt: Timestamp.now()
       });

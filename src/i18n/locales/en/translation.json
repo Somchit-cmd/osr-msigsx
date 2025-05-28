@@ -319,5 +319,11 @@
   },
   "footer": {
     "copyright": "Office Supplies Request System. MSIG-Sokxay Insurance Co., Ltd. All rights reserved."
+  },
+  "notificationMessages": {
+    "newRequest": "New request #{{id}} submitted by {{name}}.",
+    "requestApproved": "Your request #{{id}} was approved.",
+    "requestRejected": "Your request #{{id}} was rejected.",
+    "requestFulfilled": "Your request #{{id}} was fulfilled."
   }
 }

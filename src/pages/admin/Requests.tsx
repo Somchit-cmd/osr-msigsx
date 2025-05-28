@@ -114,7 +114,10 @@ const AdminRequests = () => {
         userId,
         type: `request_${statusMap[action]}`,
         requestId: id,
-        message: `Your request #${id} was ${statusMap[action]}.`,
+        message: action === "approve" 
+          ? `notificationMessages.requestApproved` 
+          : `notificationMessages.request${action.charAt(0).toUpperCase() + action.slice(1)}ed`,
+        messageParams: {id},
         read: false,
         createdAt: Timestamp.now()
       });

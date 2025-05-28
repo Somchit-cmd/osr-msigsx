@@ -175,7 +175,11 @@ export default function NotificationBell({ userId }) {
                   onMouseOut={e => e.currentTarget.style.background = n.read ? "#fff" : "#eaf3ff"}
                 >
                   {getIcon(n.type)}
-                  <span style={{ flex: 1 }}>{n.message || n.id}</span>
+                  <span style={{ flex: 1 }}>
+                    {n.message.startsWith('notificationMessages.') 
+                      ? t(n.message, n.messageParams || {}) 
+                      : n.message || n.id}
+                  </span>
                   {!n.read && (
                     <span style={{
                       width: 8,
