@@ -210,7 +210,7 @@ const AdminInventory = () => {
                     }`}
                     onClick={() => setActiveCategory(category)}
                   >
-                    {t(`categories.${category.toLowerCase().replace(/\s+/g, '')}`)}
+                    {t(`categories.${category.toLowerCase().replace(/[\s&]+/g, '')}`)}
                   </Button>
                 ))}
               </div>

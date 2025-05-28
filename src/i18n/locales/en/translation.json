@@ -97,7 +97,8 @@
     "paper": "Paper",
     "electronics": "Electronics",
     "tapesglue": "Tapes & Glue",
-    "binding": "Binding"
+    "binding": "Binding",
+    "firstaidkit": "First Aid Kit"
   },
   "requestForm": {
     "title": "Request Office Supplies",
