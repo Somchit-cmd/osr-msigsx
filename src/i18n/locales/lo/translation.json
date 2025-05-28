@@ -268,11 +268,11 @@
       "department": "ພະແນກ",
       "equipment": "ອຸປະກອນ",
       "quantity": "ຈຳນວນ",
-      "notes": "ໝາຍເຫດ",
+      "notes": "ໝາຍເຫດຈາກຜູ້ຂໍເບີກ",
       "status": "ສະຖານະ",
       "approvalDate": "ວັນທີອະນຸມັດ",
       "fulfillmentDate": "ວັນທີສຳເລັດ",
-      "adminNotes": "ໝາຍເຫດຜູ້ບໍລິຫານ"
+      "adminNotes": "ໝາຍເຫດຜູ້ດູແລລະບົບ"
     },
     "statuses": {
       "pending": "ລໍຖ້າ",
