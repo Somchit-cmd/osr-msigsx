@@ -34,7 +34,22 @@ const auth = getAuth();
 
 // Sign in user
 export async function signIn(email: string, password: string) {
-  return await signInWithEmailAndPassword(auth, email, password);
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  
+  // Get the user's document from Firestore
+  const employeeId = userCredential.user.uid;
+  const userDoc = await getDoc(doc(db, "users", employeeId));
+  
+  if (userDoc.exists()) {
+    const userData = userDoc.data();
+    // Add a check for the position field
+    if (!userData.position) {
+      // Update the user with a default position if it's missing
+      await updateDoc(doc(db, "users", employeeId), { position: "" });
+    }
+  }
+  
+  return userCredential;
 }
 
 // Sign out user
@@ -130,6 +145,15 @@ export async function addUser(newUser: User) {
 // Edit an existing user
 export async function editUser(user) {
   const userRef = doc(db, "users", user.id);
+  
+  // Get current user data to preserve password if not provided
+  if (!user.password) {
+    const currentUser = await getDoc(userRef);
+    if (currentUser.exists() && currentUser.data().password) {
+      user.password = currentUser.data().password;
+    }
+  }
+  
   await updateDoc(userRef, { ...user, updatedAt: new Date() });
 }
 

@@ -115,7 +115,8 @@
   "common": {
     "cancel": "Cancel",
     "edit": "Edit",
-    "remove": "Remove"
+    "remove": "Remove",
+    "close": "Close"
   },
   "myRequests": {
     "title": "My Requests",
@@ -328,5 +329,18 @@
     "requestApproved": "Your request #{{id}} was approved.",
     "requestRejected": "Your request #{{id}} was rejected.",
     "requestFulfilled": "Your request #{{id}} was fulfilled."
+  },
+  "limitations": {
+    "title": "Item Request Limitations",
+    "description": "Set monthly request limits for {{name}} by position",
+    "current": "Current Limitations",
+    "noLimits": "No limitations have been set for this item",
+    "addNew": "Add New Limitation",
+    "position": "Position",
+    "selectPosition": "Select a position",
+    "monthlyLimit": "Monthly Limit",
+    "addLimit": "Add Limitation",
+    "monthlyLimitExceeded": "Monthly limit exceeded",
+    "limitMessage": "You can only request {{limit}} {{itemName}}(s) per month. You have used {{used}} and have {{remaining}} remaining."
   }
 }

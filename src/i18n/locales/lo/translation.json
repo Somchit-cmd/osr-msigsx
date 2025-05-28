@@ -110,12 +110,15 @@
     "notes": "ໝາຍເຫດ",
     "notesPlaceholder": "ລະບຸລາຍລະອຽດກ່ຽວກັບຄຳຂໍຂອງທ່ານ...",
     "submit": "ສົ່ງຄຳຂໍ",
-    "available": "ຍັງເຫຼືອ {{count}}"
+    "available": "ຍັງເຫຼືອ {{count}}",
+    "monthlyLimitExceeded": "ເກີນຂີດຈຳກັດປະຈຳເດືອນ",
+    "limitMessage": "ທ່ານສາມາດຂໍໄດ້ພຽງ {{limit}} {{itemName}} ຕໍ່ເດືອນ. ທ່ານໄດ້ໃຊ້ {{used}} ແລະ ຍັງເຫຼືອ {{remaining}}."
   },
   "common": {
     "cancel": "ຍົກເລີກ",
     "edit": "ແກ້ໄຂ",
-    "remove": "ລົບ"
+    "remove": "ລົບ",
+    "close": "ປິດ"
   },
   "myRequests": {
     "title": "ຄຳຂໍຂອງຂ້ອຍ",
@@ -329,5 +332,18 @@
     "requestApproved": "ຄຳຂໍ #{{id}} ຂອງທ່ານໄດ້ຮັບການອະນຸມັດແລ້ວ.",
     "requestRejected": "ຄຳຂໍ #{{id}} ຂອງທ່ານຖືກປະຕິເສດ.",
     "requestFulfilled": "ຄຳຂໍ #{{id}} ຂອງທ່ານໄດ້ຮັບການສົ່ງມອບແລ້ວ."
+  },
+  "limitations": {
+    "title": "ການກຳນົດຈຳນວນຈຳກັດຄຳຂໍອຸປະກອນ",
+    "description": "ກຳນົດຈຳນວນຮ້ອງຂໍອຸປະກອນຕໍ່ເດືອນຕາມຕຳແຫນ່ງສຳລັບ {{name}}",
+    "current": "ຈຳນວນຈຳກັດປັດຈຸບັນ",
+    "noLimits": "ບໍ່ມີການກຳນົດຈຳນວນຈຳກັດສຳລັບອຸປະກອນນີ້",
+    "addNew": "ເພີ່ມການກຳນົດຈຳນວນຈຳກັດໃໝ່",
+    "position": "ຕຳແຫນ່ງ",
+    "selectPosition": "ເລືອກຕຳແຫນ່ງ",
+    "monthlyLimit": "ຈຳນວນຮ້ອງຂໍສູງສຸດຕໍ່ເດືອນ",
+    "addLimit": "ເພີ່ມການກຳນົດຈຳນວນຈຳກັດ",
+    "monthlyLimitExceeded": "ເກີນຂີດຈຳກັດປະຈຳເດືອນ",
+    "limitMessage": "ທ່ານສາມາດຂໍໄດ້ພຽງ {{limit}} {{itemName}} ຕໍ່ເດືອນ. ທ່ານໄດ້ໃຊ້ {{used}} ແລະ ຍັງເຫຼືອ {{remaining}}."
   }
 }

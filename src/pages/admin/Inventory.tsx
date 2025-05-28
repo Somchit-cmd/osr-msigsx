@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { InventoryItem } from "@/types";
 import placeholderImg from "/placeholder.svg";
 import { useTranslation } from "react-i18next";
+import ItemLimitationsDialog from "@/components/ItemLimitationsDialog";
 
 const AdminInventory = () => {
   const { t } = useTranslation();
@@ -35,6 +36,7 @@ const AdminInventory = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isStockDialogOpen, setIsStockDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isLimitationsDialogOpen, setIsLimitationsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [stockAdjustment, setStockAdjustment] = useState({
     type: "increase",
@@ -307,6 +309,16 @@ const AdminInventory = () => {
                           onClick={() => openEditDialog(item)}
                         >
                           <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedItem(item);
+                            setIsLimitationsDialogOpen(true);
+                          }}
+                        >
+                          Limits
                         </Button>
                       </div>
                     </TableCell>
@@ -687,6 +699,12 @@ const AdminInventory = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      <ItemLimitationsDialog
+        open={isLimitationsDialogOpen}
+        onOpenChange={setIsLimitationsDialogOpen}
+        item={selectedItem}
+      />
       
       <Footer />
     </div>

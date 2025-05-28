@@ -9,9 +9,11 @@ import {
   query,
   where,
   orderBy,
-  Timestamp
+  Timestamp,
+  getDoc
 } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
+import { recordItemUsage } from "./usageTrackingService";
 
 // Types
 export interface Request {
@@ -58,6 +60,20 @@ export async function updateRequestStatus(
   if (status === 'approved') {
     updateData.approvedBy = userId;
     updateData.approvedAt = Timestamp.now();
+    
+    // Get the request details to record usage
+    const requestDoc = await getDoc(doc(db, "requests", requestId));
+    if (requestDoc.exists()) {
+      const requestData = requestDoc.data() as Request;
+      
+      // Record usage when approved
+      await recordItemUsage(
+        requestData.employeeId,
+        requestData.equipmentId,
+        requestData.equipmentName,
+        requestData.quantity
+      );
+    }
   } else if (status === 'fulfilled') {
     updateData.fulfilledAt = Timestamp.now();
   }

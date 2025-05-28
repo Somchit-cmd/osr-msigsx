@@ -26,6 +26,7 @@ import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useTranslation } from "react-i18next";
+import { checkMonthlyLimit } from "@/lib/usageTrackingService";
 
 interface RequestFormProps {
   isOpen: boolean;
@@ -124,7 +125,7 @@ export default function RequestForm({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!equipment) return;
@@ -133,6 +134,34 @@ export default function RequestForm({
       toast({
         title: "Invalid quantity",
         description: `Only ${equipment.available} ${equipment.name}(s) available.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get current user
+    const user =
+      JSON.parse(sessionStorage.getItem("user") || "null") ||
+      JSON.parse(localStorage.getItem("user") || "null");
+
+    // Check monthly limitations based on position
+    const userPosition = user?.position || ""; // Add fallback for undefined position
+    const limitCheck = await checkMonthlyLimit(
+      user.id,
+      equipment.id,
+      userPosition,
+      formData.quantity
+    );
+
+    if (!limitCheck.allowed) {
+      toast({
+        title: t("limitations.monthlyLimitExceeded"),
+        description: t("limitations.limitMessage", {
+          limit: limitCheck.limit,
+          itemName: equipment.name,
+          used: limitCheck.currentUsage,
+          remaining: limitCheck.remaining
+        }),
         variant: "destructive",
       });
       return;

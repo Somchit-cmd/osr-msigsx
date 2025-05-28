@@ -15,7 +15,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import logo from "@/assets/logo-png-only.webp";
 import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
@@ -39,46 +39,70 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
-    const userDoc = await getDoc(doc(db, "users", employeeId));
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      if (userData.password === password) {
-        // Clear previous sessions
-        localStorage.removeItem("user");
-        sessionStorage.removeItem("user");
-        // Store user session based on "Remember me"
-        if (rememberMe) {
-          localStorage.setItem("user", JSON.stringify(userData));
+    
+    try {
+      const userDoc = await getDoc(doc(db, "users", employeeId));
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        
+        if (userData.password === password) {
+          // If position is an object or null, fix it
+          if (typeof userData.position === 'object' || userData.position === null) {
+            await updateDoc(doc(db, "users", employeeId), { position: "" });
+            userData.position = "";
+          }
+          
+          // Clear previous sessions
+          localStorage.removeItem("user");
+          sessionStorage.removeItem("user");
+          
+          // Store user session based on "Remember me"
+          const userToStore = {...userData, id: employeeId};
+          
+          if (rememberMe) {
+            localStorage.setItem("user", JSON.stringify(userToStore));
+          } else {
+            sessionStorage.setItem("user", JSON.stringify(userToStore));
+          }
+          
+          toast({
+            title: t('login.successTitle'),
+            description: t('login.successMessage', {name: `${userData.name} ${userData.surname}`}),
+          });
+          
+          // Redirect based on role
+          if (userData.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/");
+          }
         } else {
-          sessionStorage.setItem("user", JSON.stringify(userData));
-        }
-        toast({
-          title: t('login.successTitle'),
-          description: t('login.successMessage', {name: `${userData.name} ${userData.surname}`}),
-        });
-        // Redirect based on role
-        if (userData.role === "admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/");
+          toast({
+            title: t('login.failedTitle'),
+            description: t('login.invalidPassword'),
+            variant: "destructive",
+          });
+          setError(t('login.invalidPassword'));
         }
       } else {
         toast({
           title: t('login.failedTitle'),
-          description: t('login.invalidPassword'),
+          description: t('login.userNotFound'),
           variant: "destructive",
         });
-        setError(t('login.invalidPassword'));
+        setError(t('login.userNotFound'));
       }
-    } else {
+    } catch (error) {
       toast({
-        title: t('login.failedTitle'),
-        description: t('login.userNotFound'),
+        title: "Error",
+        description: "An unexpected error occurred: " + (error.message || error),
         variant: "destructive",
       });
-      setError(t('login.userNotFound'));
+      setError("Unexpected error. Check console for details.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   return (
