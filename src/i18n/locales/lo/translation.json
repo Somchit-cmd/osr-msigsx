@@ -296,7 +296,8 @@
     "role": "ບົດບາດ",
     "actions": "ໝາຍເຫດ",
     "addCategory": "ເພີ່ມໝວດໝູ່",
-    "categoryName": "ຊື່ໝວດໝູ່"
+    "categoryName": "ຊື່ໝວດໝູ່",
+    "position": "ຕຳແຫນ່ງ"
   },
   "addUser": {
     "title": "ເພີ່ມຜູ້ໃຊ້ໃໝ່",
@@ -312,7 +313,8 @@
     "role": "ບົດບາດ",
     "employee": "ພະນັກງານ",
     "admin": "ຜູ້ດູແລລະບົບ",
-    "addUser": "ເພີ່ມຜູ້ໃຊ້"
+    "addUser": "ເພີ່ມຜູ້ໃຊ້",
+    "selectPosition": "ເລືອກຕຳແຫນ່ງ"
   },
   "addCategory": {
     "title": "ເພີ່ມໝວດໝູ່",

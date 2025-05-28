@@ -104,6 +104,7 @@ export default function AdminSettings() {
                   <th className="p-3 text-left font-medium rounded-tl-xl">{t('settings.username')}</th>
                   <th className="p-3 text-left font-medium">{t('settings.name')}</th>
                   <th className="p-3 text-left font-medium">{t('settings.department')}</th>
+                  <th className="p-3 text-left font-medium">{t('settings.position')}</th>
                   <th className="p-3 text-left font-medium">{t('settings.role')}</th>
                   <th className="p-3 text-left font-medium rounded-tr-xl">{t('settings.actions')}</th>
                 </tr>
@@ -114,6 +115,7 @@ export default function AdminSettings() {
                     <td className="p-3 border-b">{user.id}</td>
                     <td className="p-3 border-b">{user.name} {user.surname}</td>
                     <td className="p-3 border-b">{user.department}</td>
+                    <td className="p-3 border-b">{user.position}</td>
                     <td className="p-3 border-b">{user.role}</td>
                     <td className="p-3 border-b">
                       <Button

@@ -22,6 +22,7 @@ type EditUserDialogProps = {
     email: string;
     password?: string;
     role: string;
+    position: string;
   } | null;
   onEditUser: (user: {
     id: string;
@@ -31,6 +32,7 @@ type EditUserDialogProps = {
     email: string;
     password?: string;
     role: string;
+    position: string;
   }) => void;
 };
 
@@ -49,6 +51,7 @@ export default function EditUserDialog({
     email: "",
     password: "",
     role: "employee",
+    position: "",
   });
 
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function EditUserDialog({
         email: user.email || "",
         password: "",
         role: user.role || "employee",
+        position: user.position || "",
       });
     }
   }, [user, open]);
@@ -86,7 +90,8 @@ export default function EditUserDialog({
     editUser.surname.trim() &&
     editUser.department.trim() &&
     editUser.email.trim() &&
-    editUser.role.trim();
+    editUser.role.trim() &&
+    editUser.position.trim();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,6 +204,25 @@ export default function EditUserDialog({
                 >
                   <option value="employee">Employee</option>
                   <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="position" className="mb-2">
+                  Position
+                </Label>
+                <select
+                  id="position"
+                  className="w-full border rounded px-2 py-2"
+                  value={editUser.position}
+                  onChange={(e) =>
+                    setEditUser({ ...editUser, position: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Select Position</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Officer">Officer</option>
+                  <option value="Assistant">Assistant</option>
                 </select>
               </div>
             </div>

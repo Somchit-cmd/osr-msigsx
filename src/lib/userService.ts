@@ -24,6 +24,7 @@ export interface User {
   name: string;
   role: 'admin' | 'employee';
   department: string;
+  position: string;
   createdAt: Date;
   updatedAt: Date;
 }

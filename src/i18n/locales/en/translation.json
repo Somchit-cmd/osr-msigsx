@@ -295,7 +295,8 @@
     "role": "Role",
     "actions": "Actions",
     "addCategory": "Add Category",
-    "categoryName": "Category Name"
+    "categoryName": "Category Name",
+    "position": "Position"
   },
   "addUser": {
     "title": "Add New User",
@@ -311,7 +312,8 @@
     "role": "Role",
     "employee": "Employee",
     "admin": "Admin",
-    "addUser": "Add User"
+    "addUser": "Add User",
+    "selectPosition": "Select position"
   },
   "addCategory": {
     "title": "Add Category",

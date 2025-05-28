@@ -17,6 +17,7 @@ type AddUserDialogProps = {
     email: string;
     password: string;
     role: string;
+    position: string;
   }) => void;
 };
 
@@ -30,6 +31,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
     email: "",
     password: "",
     role: "employee",
+    position: "",
   });
 
   const [departments, setDepartments] = useState([]);
@@ -44,6 +46,7 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
         email: "",
         password: "",
         role: "employee",
+        position: "",
       });
     }
   }, [open]);
@@ -71,7 +74,8 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
     newUser.department.trim() &&
     newUser.email.trim() &&
     newUser.password.trim() &&
-    newUser.role.trim();
+    newUser.role.trim() &&
+    newUser.position.trim();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,6 +175,21 @@ export default function AddUserDialog({ open, onOpenChange, onAddUser }: AddUser
                 >
                   <option value="employee">{t('addUser.employee')}</option>
                   <option value="admin">{t('addUser.admin')}</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="position">{t('addUser.position')}</Label>
+                <select
+                  id="position"
+                  className="w-full border rounded px-2 py-2"
+                  value={newUser.position}
+                  onChange={e => setNewUser({ ...newUser, position: e.target.value })}
+                  required
+                >
+                  <option value="">{t('addUser.selectPosition')}</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Officer">Officer</option>
+                  <option value="Assistant">Assistant</option>
                 </select>
               </div>
             </div>
