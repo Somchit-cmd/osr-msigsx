@@ -172,7 +172,7 @@
     "welcomeTitle": "Welcome to MSIGSX OSR",
     "welcomeDescription": "Please sign in with your staff credentials to continue.",
     "employeeId": "Employee ID",
-    "employeeIdPlaceholder": "Your staff id number",
+    "employeeIdPlaceholder": "Enter your staff id number (no 0 at the beginning)",
     "password": "Password",
     "passwordPlaceholder": "Repeat your staff id number",
     "rememberMe": "Remember me",
