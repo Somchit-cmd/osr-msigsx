@@ -284,7 +284,14 @@
     "noDataToExport": "No data to export",
     "noDataForFilters": "No data available for the selected filters",
     "reportExported": "Report exported",
-    "exportSuccess": "Report for {{period}} activity has been exported successfully."
+    "exportSuccess": "Report for {{period}} activity has been exported successfully.",
+    "byEquipment": {
+      "title": "Requests by Equipment",
+      "description": "Distribution of requests by equipment type"
+    },
+    "requestCount": "Request Count",
+    "totalQuantity": "Total Quantity",
+    "requests": "Requests"
   },
   "settings": {
     "userManagement": "User Management",

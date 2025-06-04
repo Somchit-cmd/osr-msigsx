@@ -287,7 +287,13 @@
     "noDataToExport": "ບໍ່ມີຂໍ້ມູນທີ່ຈະສົ່ງອອກ",
     "noDataForFilters": "ບໍ່ມີຂໍ້ມູນສຳລັບການກັ່ນຕອງທີ່ເລືອກ",
     "reportExported": "ສົ່ງອອກລາຍງານແລ້ວ",
-    "exportSuccess": "ລາຍງານສຳລັບກິດຈະກຳ{{period}}ໄດ້ຖືກສົ່ງອອກຢ່າງສຳເລັດ."
+    "exportSuccess": "ລາຍງານສຳລັບກິດຈະກຳ{{period}}ໄດ້ຖືກສົ່ງອອກຢ່າງສຳເລັດ.",
+    "byEquipment": {
+      "title": "ຄຳຂໍຕາມອຸປະກອນ",
+      "description": "ການແຍກຄຳຂໍຕາມອຸປະກອນ"
+    },
+    "requestCount": "ຈຳນວນຄຳຂໍ",
+    "totalQuantity": "ຈຳນວນອຸປະກອນ"
   },
   "settings": {
     "userManagement": "ການຈັດການຜູ້ໃຊ້",

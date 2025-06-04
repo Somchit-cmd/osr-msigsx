@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -36,8 +36,14 @@ import { subscribeToDepartments } from "@/lib/departmentService";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Pagination from "@/components/Pagination";
-import { PieChart as RePieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { BarChart as ReBarChart, Bar, XAxis, YAxis } from 'recharts';
+import {
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { BarChart as ReBarChart, Bar, XAxis, YAxis } from "recharts";
 import Papa from "papaparse";
 
 const PAGE_SIZE = 10;
@@ -81,7 +87,11 @@ const AdminReports = () => {
       setEndDate(today.toISOString().split("T")[0]);
     } else if (activeTab === "monthly") {
       const today = new Date();
-      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const firstDayOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1
+      );
       setStartDate(firstDayOfMonth.toISOString().split("T")[0]);
       setEndDate(today.toISOString().split("T")[0]);
     }
@@ -113,24 +123,28 @@ const AdminReports = () => {
   const generateReport = () => {
     if (filteredRequests.length === 0) {
       toast({
-        title: t('reports.noDataToExport'),
-        description: t('reports.noDataForFilters'),
+        title: t("reports.noDataToExport"),
+        description: t("reports.noDataForFilters"),
         variant: "destructive",
       });
       return;
     }
 
     // Prepare data for CSV
-    const csvData = filteredRequests.map(req => ({
+    const csvData = filteredRequests.map((req) => ({
       "Request Date": formatDate(req.createdAt?.toDate?.() || req.createdAt),
-      "Employee": req.employeeName,
-      "Department": req.department,
-      "Equipment": req.equipmentName,
-      "Quantity": req.quantity,
-      "Notes": req.notes || "",
-      "Status": req.status,
-      "Approval Date": req.approvedAt ? formatDate(req.approvedAt?.toDate?.() || req.approvedAt) : "",
-      "Fulfillment Date": req.fulfilledAt ? formatDate(req.fulfilledAt?.toDate?.() || req.fulfilledAt) : "",
+      Employee: req.employeeName,
+      Department: req.department,
+      Equipment: req.equipmentName,
+      Quantity: req.quantity,
+      Notes: req.notes || "",
+      Status: req.status,
+      "Approval Date": req.approvedAt
+        ? formatDate(req.approvedAt?.toDate?.() || req.approvedAt)
+        : "",
+      "Fulfillment Date": req.fulfilledAt
+        ? formatDate(req.fulfilledAt?.toDate?.() || req.fulfilledAt)
+        : "",
       "Admin Notes": req.adminNotes || "",
     }));
 
@@ -147,8 +161,10 @@ const AdminReports = () => {
     document.body.removeChild(link);
 
     toast({
-      title: t('reports.reportExported'),
-      description: t('reports.exportSuccess', {period: t(`reports.periods.${activeTab}`)}),
+      title: t("reports.reportExported"),
+      description: t("reports.exportSuccess", {
+        period: t(`reports.periods.${activeTab}`),
+      }),
     });
   };
 
@@ -176,10 +192,18 @@ const AdminReports = () => {
 
   // Calculate statistics
   const totalRequests = filteredRequests.length;
-  const approvedOnly = filteredRequests.filter(r => r.status === "approved").length;
-  const pendingOnly = filteredRequests.filter(r => r.status === "pending").length;
-  const rejectedOnly = filteredRequests.filter(r => r.status === "rejected").length;
-  const fulfilledOnly = filteredRequests.filter(r => r.status === "fulfilled").length;
+  const approvedOnly = filteredRequests.filter(
+    (r) => r.status === "approved"
+  ).length;
+  const pendingOnly = filteredRequests.filter(
+    (r) => r.status === "pending"
+  ).length;
+  const rejectedOnly = filteredRequests.filter(
+    (r) => r.status === "rejected"
+  ).length;
+  const fulfilledOnly = filteredRequests.filter(
+    (r) => r.status === "fulfilled"
+  ).length;
 
   // Generate data for charts
   const departmentData = departments
@@ -199,7 +223,30 @@ const AdminReports = () => {
   ];
 
   // Only include statuses with value > 0
-  const statusData = statusDataRaw.filter(d => d.value > 0);
+  const statusData = statusDataRaw.filter((d) => d.value > 0);
+
+  // Add new data aggregation for equipment
+  const equipmentMap = {};
+  filteredRequests.forEach((request) => {
+    if (!equipmentMap[request.equipmentName]) {
+      equipmentMap[request.equipmentName] = {
+        count: 0, 
+        quantity: 0
+      };
+    }
+    equipmentMap[request.equipmentName].count++;
+    equipmentMap[request.equipmentName].quantity += (parseInt(request.quantity) || 0);
+  });
+
+  const equipmentData = Object.keys(equipmentMap)
+    .map(name => ({ 
+      name, 
+      value: equipmentMap[name].count,
+      quantity: equipmentMap[name].quantity 
+    }))
+    .filter(item => item.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 10);
 
   const totalPages = Math.ceil(filteredRequests.length / PAGE_SIZE);
   const paginatedRequests = filteredRequests.slice(
@@ -212,10 +259,8 @@ const AdminReports = () => {
       <Header userRole="admin" />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">{t('reports.title')}</h1>
-        <p className="text-text-muted mb-8">
-          {t('reports.description')}
-        </p>
+        <h1 className="text-3xl font-bold mb-2">{t("reports.title")}</h1>
+        <p className="text-text-muted mb-8">{t("reports.description")}</p>
 
         <div className="bg-white rounded-lg border p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
@@ -226,10 +271,18 @@ const AdminReports = () => {
               className="flex-1"
             >
               <TabsList className="grid grid-cols-4 h-10 w-full md:w-[400px]">
-                <TabsTrigger value="daily">{t('reports.periods.daily')}</TabsTrigger>
-                <TabsTrigger value="weekly">{t('reports.periods.weekly')}</TabsTrigger>
-                <TabsTrigger value="monthly">{t('reports.periods.monthly')}</TabsTrigger>
-                <TabsTrigger value="custom">{t('reports.periods.custom')}</TabsTrigger>
+                <TabsTrigger value="daily">
+                  {t("reports.periods.daily")}
+                </TabsTrigger>
+                <TabsTrigger value="weekly">
+                  {t("reports.periods.weekly")}
+                </TabsTrigger>
+                <TabsTrigger value="monthly">
+                  {t("reports.periods.monthly")}
+                </TabsTrigger>
+                <TabsTrigger value="custom">
+                  {t("reports.periods.custom")}
+                </TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -237,7 +290,7 @@ const AdminReports = () => {
               onClick={generateReport}
               className="bg-brand-blue hover:bg-brand-blue/90"
             >
-              <Download className="h-4 w-4 mr-2" /> {t('reports.exportReport')}
+              <Download className="h-4 w-4 mr-2" /> {t("reports.exportReport")}
             </Button>
           </div>
 
@@ -246,7 +299,7 @@ const AdminReports = () => {
               <>
                 <div>
                   <label className="block text-sm font-medium text-text-muted mb-1">
-                    {t('reports.startDate')}
+                    {t("reports.startDate")}
                   </label>
                   <Input
                     type="date"
@@ -256,7 +309,7 @@ const AdminReports = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-text-muted mb-1">
-                    {t('reports.endDate')}
+                    {t("reports.endDate")}
                   </label>
                   <Input
                     type="date"
@@ -268,14 +321,16 @@ const AdminReports = () => {
             )}
             <div>
               <label className="block text-sm font-medium text-text-muted mb-1">
-                {t('reports.department')}
+                {t("reports.department")}
               </label>
               <Select value={department} onValueChange={setDepartment}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t('reports.allDepartments')} />
+                  <SelectValue placeholder={t("reports.allDepartments")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('reports.allDepartments')}</SelectItem>
+                  <SelectItem value="all">
+                    {t("reports.allDepartments")}
+                  </SelectItem>
                   {departments.map((dept) => (
                     <SelectItem key={dept.id} value={dept.name}>
                       {dept.name}
@@ -290,7 +345,9 @@ const AdminReports = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="text-4xl font-bold mb-1">{totalRequests}</div>
-                <div className="text-sm text-text-muted">{t('reports.totalRequests')}</div>
+                <div className="text-sm text-text-muted">
+                  {t("reports.totalRequests")}
+                </div>
               </CardContent>
             </Card>
 
@@ -300,7 +357,7 @@ const AdminReports = () => {
                   {approvedOnly}
                 </div>
                 <div className="text-sm text-text-muted">
-                  {t('reports.approvedFulfilled')}
+                  {t("reports.approvedFulfilled")}
                 </div>
               </CardContent>
             </Card>
@@ -310,7 +367,9 @@ const AdminReports = () => {
                 <div className="text-4xl font-bold mb-1 text-yellow-600">
                   {pendingOnly}
                 </div>
-                <div className="text-sm text-text-muted">{t('reports.pending')}</div>
+                <div className="text-sm text-text-muted">
+                  {t("reports.pending")}
+                </div>
               </CardContent>
             </Card>
 
@@ -319,7 +378,9 @@ const AdminReports = () => {
                 <div className="text-4xl font-bold mb-1 text-red-600">
                   {rejectedOnly}
                 </div>
-                <div className="text-sm text-text-muted">{t('reports.rejected')}</div>
+                <div className="text-sm text-text-muted">
+                  {t("reports.rejected")}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -328,16 +389,17 @@ const AdminReports = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <RePieChart className="h-5 w-5 mr-2" /> {t('reports.byDepartment.title')}
+                  <RePieChart className="h-5 w-5 mr-2" />{" "}
+                  {t("reports.byDepartment.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t('reports.byDepartment.description')}
+                  {t("reports.byDepartment.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-80 flex items-center justify-center">
                 {departmentData.length === 0 ? (
                   <div className="text-center text-gray-500">
-                    <p>{t('reports.noData')}</p>
+                    <p>{t("reports.noData")}</p>
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
@@ -349,12 +411,24 @@ const AdminReports = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={100}
-                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                        label={({ name, percent }) =>
+                          `${name} (${(percent * 100).toFixed(0)}%)`
+                        }
                       >
                         {departmentData.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={["#2563eb", "#10b981", "#f59e42", "#ef4444", "#a21caf", "#fbbf24", "#6366f1"][index % 7]}
+                            fill={
+                              [
+                                "#2563eb",
+                                "#10b981",
+                                "#f59e42",
+                                "#ef4444",
+                                "#a21caf",
+                                "#fbbf24",
+                                "#6366f1",
+                              ][index % 7]
+                            }
                           />
                         ))}
                       </Pie>
@@ -368,16 +442,17 @@ const AdminReports = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <PieChart className="h-5 w-5 mr-2" /> {t('reports.byStatus.title')}
+                  <PieChart className="h-5 w-5 mr-2" />{" "}
+                  {t("reports.byStatus.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t('reports.byStatus.description')}
+                  {t("reports.byStatus.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-80 flex items-center justify-center">
-                {statusData.every(d => d.value === 0) ? (
+                {statusData.every((d) => d.value === 0) ? (
                   <div className="text-center text-gray-500">
-                    <p>{t('reports.noData')}</p>
+                    <p>{t("reports.noData")}</p>
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
@@ -389,12 +464,20 @@ const AdminReports = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={100}
-                        label={({ name, percent }) => `${t(`reports.statuses.${name.toLowerCase()}`)} (${(percent * 100).toFixed(0)}%)`}
+                        label={({ name, percent }) =>
+                          `${t(`reports.statuses.${name.toLowerCase()}`)} (${(
+                            percent * 100
+                          ).toFixed(0)}%)`
+                        }
                       >
                         {statusData.map((entry, index) => (
                           <Cell
                             key={`cell-status-${index}`}
-                            fill={["#22c55e", "#fbbf24", "#ef4444", "#2563eb"][index]}
+                            fill={
+                              ["#22c55e", "#fbbf24", "#ef4444", "#2563eb"][
+                                index
+                              ]
+                            }
                           />
                         ))}
                       </Pie>
@@ -406,43 +489,143 @@ const AdminReports = () => {
             </Card>
           </div>
 
+          <div className="mb-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <PieChart className="h-5 w-5 mr-2" /> 
+                  {t("reports.byEquipment.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("reports.byEquipment.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-80 flex items-center justify-center">
+                {equipmentData.length === 0 ? (
+                  <div className="text-center text-gray-500">
+                    <p>{t("reports.noData")}</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ReBarChart data={equipmentData} margin={{ bottom: 100 }}>
+                      <XAxis 
+                        dataKey="name"
+                        height={100}
+                        interval={0}
+                        tick={(props) => {
+                          const { x, y, payload } = props;
+                          
+                          // Split long text into multiple lines (20 chars max per line)
+                          const name = payload.value;
+                          const words = name.split(' ');
+                          let lines = [];
+                          let currentLine = '';
+                          
+                          words.forEach(word => {
+                            if ((currentLine + ' ' + word).length > 20 && currentLine) {
+                              lines.push(currentLine);
+                              currentLine = word;
+                            } else {
+                              currentLine = currentLine ? currentLine + ' ' + word : word;
+                            }
+                          });
+                          
+                          if (currentLine) {
+                            lines.push(currentLine);
+                          }
+                          
+                          return (
+                            <g transform={`translate(${x},${y})`}>
+                              {lines.map((line, i) => (
+                                <text
+                                  key={i}
+                                  x={0}
+                                  y={i * 12} 
+                                  dy={16}
+                                  textAnchor="middle"
+                                  fill="#666"
+                                  fontSize={10}
+                                >
+                                  {line}
+                                </text>
+                              ))}
+                            </g>
+                          );
+                        }}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        formatter={(value, name, props) => {
+                          return [
+                            `${t("reports.requestCount")}: ${value}, ${t("reports.totalQuantity")}: ${props.payload.quantity}`,
+                            t("reports.requests")
+                          ];
+                        }}
+                      />
+                      <Bar 
+                        dataKey="value" 
+                        fill="#3b82f6" 
+                        name={t("reports.requests")}
+                      >
+                        {equipmentData.map((entry, index) => (
+                          <Cell
+                            key={`cell-equipment-${index}`}
+                            fill={[
+                              "#2563eb",
+                              "#10b981",
+                              "#f59e42",
+                              "#ef4444",
+                              "#a21caf",
+                              "#fbbf24",
+                              "#6366f1",
+                            ][index % 7]}
+                          />
+                        ))}
+                      </Bar>
+                    </ReBarChart>
+                  </ResponsiveContainer>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
           <div>
             <h3 className="text-lg font-semibold mb-4">
-              {t('reports.detailedData')}
+              {t("reports.detailedData")}
             </h3>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.requestDate')}
+                      {t("reports.table.requestDate")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.employee')}
+                      {t("reports.table.employee")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.department')}
+                      {t("reports.table.department")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.equipment')}
+                      {t("reports.table.equipment")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.quantity')}
+                      {t("reports.table.quantity")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.notes')}
+                      {t("reports.table.notes")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.status')}
+                      {t("reports.table.status")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.approvalDate')}
+                      {t("reports.table.approvalDate")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.fulfillmentDate')}
+                      {t("reports.table.fulfillmentDate")}
                     </TableHead>
                     <TableHead className="bg-gray-100 font-bold">
-                      {t('reports.table.adminNotes')}
+                      {t("reports.table.adminNotes")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -453,7 +636,7 @@ const AdminReports = () => {
                         colSpan={10}
                         className="text-center py-10 text-gray-500"
                       >
-                        {t('reports.noDataForFilters')}
+                        {t("reports.noDataForFilters")}
                       </TableCell>
                     </TableRow>
                   ) : (
