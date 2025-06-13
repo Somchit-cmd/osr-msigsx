@@ -23,7 +23,7 @@ A modern web application built with React, TypeScript, and Vite, featuring a rob
 
 1. Clone the repository:
 ```bash
-git clone [your-repository-url]
+git clone https://github.com/Somchit-cmd/msigsx-osr.git
 cd msigsx-osr
 ```
 
@@ -115,7 +115,7 @@ src/
 
 ## 📝 License
 
-[Your License] - See LICENSE file for details
+MIT License - See [LICENSE](LICENSE) file for details
 
 ## 👥 Contributing
 
@@ -127,4 +127,8 @@ src/
 
 ## 📧 Contact
 
-[Your Contact Information]
+**Somchit Khanthavong**  
+IT Specialist  
+MSIG Sokxay Insurance Co., Ltd.  
+📱 Phone: [+8562075397567](tel:+8562075397567)  
+📧 Email: [somchit.khanthavong@msig-sokxay.com](mailto:somchit.khanthavong@msig-sokxay.com)
