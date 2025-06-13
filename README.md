@@ -1,73 +1,130 @@
-# Welcome to your Lovable project
+# MSIGSX-OSR
 
-## Project info
+A modern web application built with React, TypeScript, and Vite, featuring a robust UI component library and internationalization support.
 
-**URL**: https://lovable.dev/projects/7d7e67a6-dace-42ea-a6f8-443cbc9ec0e0
+## 🚀 Features
 
-## How can I edit this code?
+- ⚡️ Built with [Vite](https://vitejs.dev/) for lightning-fast development
+- 🎨 Modern UI components using [shadcn/ui](https://ui.shadcn.com/)
+- 🌐 Internationalization support with [i18next](https://www.i18next.com/)
+- 🔥 Firebase integration for backend services
+- 📊 Data visualization with [Recharts](https://recharts.org/)
+- 🎯 Type-safe development with TypeScript
+- 🎨 Styled with [Tailwind CSS](https://tailwindcss.com/)
+- 🔄 State management with React Query
+- 📝 Form handling with React Hook Form and Zod validation
 
-There are several ways of editing your application.
+## 📦 Prerequisites
 
-**Use Lovable**
+- Node.js (Latest LTS version recommended)
+- npm or yarn package manager
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7d7e67a6-dace-42ea-a6f8-443cbc9ec0e0) and start prompting.
+## 🛠️ Installation
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository:
+```bash
+git clone [your-repository-url]
+cd msigsx-osr
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Create a `.env` file in the root directory and add your environment variables:
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
 
-**Use GitHub Codespaces**
+## 🚀 Development
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+To start the development server:
 
-## What technologies are used for this project?
+```bash
+npm run dev
+# or
+yarn dev
+```
 
-This project is built with:
+The application will be available at `http://localhost:5173`
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🏗️ Build
 
-## How can I deploy this project?
+To create a production build:
 
-Simply open [Lovable](https://lovable.dev/projects/7d7e67a6-dace-42ea-a6f8-443cbc9ec0e0) and click on Share -> Publish.
+```bash
+npm run build
+# or
+yarn build
+```
 
-## Can I connect a custom domain to my Lovable project?
+For development build:
 
-Yes, you can!
+```bash
+npm run build:dev
+# or
+yarn build:dev
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📁 Project Structure
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```
+src/
+├── assets/        # Static assets
+├── components/    # Reusable UI components
+├── context/       # React context providers
+├── data/         # Static data and constants
+├── hooks/        # Custom React hooks
+├── i18n/         # Internationalization files
+├── lib/          # Utility libraries and configurations
+├── pages/        # Page components
+├── scripts/      # Build and utility scripts
+├── types/        # TypeScript type definitions
+└── utils/        # Utility functions
+```
+
+## 🧪 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Create production build
+- `npm run build:dev` - Create development build
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## 🛠️ Tech Stack
+
+- [React](https://reactjs.org/) - UI Library
+- [TypeScript](https://www.typescriptlang.org/) - Type Safety
+- [Vite](https://vitejs.dev/) - Build Tool
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [shadcn/ui](https://ui.shadcn.com/) - UI Components
+- [Firebase](https://firebase.google.com/) - Backend Services
+- [React Query](https://tanstack.com/query/latest) - Data Fetching
+- [React Router](https://reactrouter.com/) - Routing
+- [i18next](https://www.i18next.com/) - Internationalization
+- [React Hook Form](https://react-hook-form.com/) - Form Handling
+- [Zod](https://zod.dev/) - Schema Validation
+
+## 📝 License
+
+[Your License] - See LICENSE file for details
+
+## 👥 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📧 Contact
+
+[Your Contact Information]
