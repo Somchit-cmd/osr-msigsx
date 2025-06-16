@@ -58,7 +58,7 @@ const Login = () => {
           sessionStorage.removeItem("user");
           
           // Store user session based on "Remember me"
-          const userToStore = {...userData, id: employeeId};
+          const userToStore = {...userData, id: employeeId, employeeId: employeeId};
           
           if (rememberMe) {
             localStorage.setItem("user", JSON.stringify(userToStore));

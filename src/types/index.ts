@@ -68,3 +68,15 @@ export type FilterParams = {
   status?: RequestStatus;
   category?: string;
 };
+
+export type NewItemRequest = {
+  id: string;
+  itemName: string;
+  reason: string;
+  userId: string;
+  employeeName: string;
+  employeeId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+  processedAt?: any;
+};

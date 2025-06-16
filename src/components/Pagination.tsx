@@ -46,7 +46,7 @@ const Pagination: React.FC<PaginationProps> = ({
       </button>
       {pageNumbers.map((num, idx) =>
         num === "..." ? (
-          <span key={idx} className="px-2 py-1 select-none">...</span>
+          <span key={`ellipsis-${idx}`} className="px-2 py-1 select-none">...</span>
         ) : (
           <button
             key={num}

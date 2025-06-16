@@ -6,6 +6,7 @@
     "myRequests": "My Requests",
     "dashboard": "Dashboard",
     "requests": "Requests",
+    "newItemRequests": "New Item Requests",
     "inventory": "Inventory",
     "reports": "Reports",
     "settings": "Settings",
@@ -84,11 +85,15 @@
     "subtitle": "Browse and request supplies for your needs",
     "searchPlaceholder": "Search supplies...",
     "noResults": "No supplies found matching your criteria.",
-    "requestNow": "Request Now"
+    "requestNow": "Request Now",
+    "requestNewItem": "Request New Item"
   },
   "equipment": {
     "available": "{{count}} available",
-    "outOfStock": "Out of stock"
+    "outOfStock": "Out of stock",
+    "view": "View",
+    "addToCart": "Add to Cart",
+    "requestNow": "Request Now"
   },
   "categories": {
     "allItems": "All Items",
@@ -110,7 +115,9 @@
     "notes": "Notes (Optional)",
     "notesPlaceholder": "Add any additional details about your request...",
     "submit": "Submit Request",
-    "available": "{{count}} available"
+    "available": "{{count}} available",
+    "successTitle": "Request Submitted",
+    "successDescription": "Your request for {{quantity}} {{name}}(s) has been submitted successfully."
   },
   "common": {
     "cancel": "Cancel",
@@ -143,6 +150,7 @@
     "reject": "Reject",
     "fulfill": "Fulfill",
     "cancel": "Cancel",
+    "delete": "Delete",
     "requestNotes": "Request Notes",
     "adminNotes": "Admin Notes",
     "rejectRequest": "Reject Request",
@@ -154,7 +162,42 @@
       "rejected": "Rejected",
       "fulfilled": "Fulfilled",
       "cancelled": "Cancelled"
-    }
+    },
+    "approveSuccess": "Request approved",
+    "rejectDescription": "Request #{{id}} has been rejected.",
+    "fulfillSuccess": "Request fulfilled",
+    "fulfillDescription": "Request #{{id}} has been fulfilled.",
+    "deleteSuccess": "Request deleted",
+    "deleteDescription": "Request #{{id}} has been deleted.",
+    "rejectDialog": {
+      "title": "Reject Request",
+      "placeholder": "Enter reason for rejection (optional)",
+      "cancel": "Cancel",
+      "confirm": "Confirm Reject"
+    },
+    "deleteDialog": {
+      "title": "Delete Request",
+      "message": "Are you sure you want to delete this request? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Confirm Delete"
+    },
+    "less": "Less",
+    "notes": "Notes",
+    "item": "Item",
+    "itemsInOrder": "Items in this Order",
+    "timeline": "Timeline",
+    "requestCreated": "Request Created",
+    "requestApproved": "Request Approved",
+    "requestFulfilled": "Request Fulfilled",
+    "multiItemOrder": "Multiple Items ({{count}})",
+    "rejectReason": "Please provide a reason for rejecting this request",
+    "deleteRequest": "Delete Request",
+    "deleteConfirmation": "Are you sure you want to delete this request? This action cannot be undone.",
+    "confirm": "Confirm",
+    "groupApproveSuccess": "Bulk Request Approved",
+    "groupApproveDescription": "{{count}} items have been approved.",
+    "groupFulfillSuccess": "Bulk Request Fulfilled",
+    "groupFulfillDescription": "{{count}} items have been fulfilled."
   },
   "logout": {
     "title": "Confirm Logout",
@@ -335,7 +378,11 @@
     "newRequest": "New request #{{id}} submitted by {{name}}.",
     "requestApproved": "Your request #{{id}} was approved.",
     "requestRejected": "Your request #{{id}} was rejected.",
-    "requestFulfilled": "Your request #{{id}} was fulfilled."
+    "requestFulfilled": "Your request #{{id}} was fulfilled.",
+    "newItemRequestSubmitted": "New item request submitted: {{itemName}} by {{userName}}.",
+    "itemRequestApproved": "New item request #{{itemName}} was approved.",
+    "itemRequestRejected": "New item request #{{itemName}} was rejected.",
+    "newBulkRequest": "New bulk request ({{count}}) submitted by {{name}}."
   },
   "limitations": {
     "title": "Item Request Limitations",
@@ -349,5 +396,85 @@
     "addLimit": "Add Limitation",
     "monthlyLimitExceeded": "Monthly limit exceeded",
     "limitMessage": "You can only request {{limit}} {{itemName}}(s) per month. You have used {{used}} and have {{remaining}} remaining."
+  },
+  "requestNewItemDialog": {
+    "title": "Request New Item",
+    "description": "Can't find what you're looking for? Request for a new item to be added to the inventory.",
+    "itemName": "Item Name",
+    "itemNamePlaceholder": "e.g. Electric Stapler",
+    "reason": "Reason",
+    "reasonPlaceholder": "Please provide a reason or purpose for this item...",
+    "submit": "Submit Request",
+    "submitting": "Submitting..."
+  },
+  "newItemRequests": {
+    "title": "New Item Requests",
+    "description": "Review and manage requests for new items from employees.",
+    "tabs": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "table": {
+      "itemName": "Item Name",
+      "employee": "Employee",
+      "requestDate": "Request Date",
+      "reason": "Reason",
+      "actions": "Actions",
+      "noRequests": "No new item requests found."
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "delete": "Delete"
+    },
+    "errors": {
+      "deleteRequest": "Error deleting request:"
+    },
+    "toast": {
+      "deleted": {
+        "title": "Request deleted",
+        "description": "The new item request has been deleted."
+      },
+      "deleteError": {
+        "description": "Failed to delete the request."
+      }
+    }
+  },
+  "cart": {
+    "button": "Requesting Cart",
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "continueShopping": "Continue Requesting",
+    "checkout": "Checkout",
+    "clear": "Clear Cart",
+    "totalItems": "Total Items",
+    "available": "{{count}} available"
+  },
+  "itemDetail": {
+    "description": "Description",
+    "viewDetails": "View item details",
+    "availability": "Availability",
+    "availableUnits": "{{count}} units available",
+    "quantity": "Quantity",
+    "cancel": "Cancel",
+    "addToCart": "Add to Cart"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "description": "Review your items and submit your request",
+    "itemsReview": "Items Review",
+    "notesLabel": "Additional Notes",
+    "notesPlaceholder": "Add any special instructions or details about your request...",
+    "summary": "Order Summary",
+    "totalItems": "Total Items",
+    "differentItems": "Different Items",
+    "submitRequest": "Submit Request",
+    "continueShopping": "Continue Shopping",
+    "processing": "Processing...",
+    "successTitle": "Request Submitted",
+    "successMessage": "Your request has been submitted successfully.",
+    "errorTitle": "Submission Failed",
+    "errorMessage": "There was an error submitting your request. Please try again."
   }
 }

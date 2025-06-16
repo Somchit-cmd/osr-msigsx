@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
   getStatusBadgeClass,
   capitalizeFirstLetter,
 } from "@/utils/helpers";
-import { doc, updateDoc, Timestamp } from "firebase/firestore";
+import { doc, updateDoc, Timestamp, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -28,26 +28,57 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { collection, addDoc } from "firebase/firestore";
 import { useTranslation } from "react-i18next";
+import { ChevronDown, ChevronUp, Package } from "lucide-react";
+
+// Extend the EquipmentRequest type to include groupId
+interface ExtendedRequest extends EquipmentRequest {
+  groupId?: string;
+}
 
 interface RequestTableProps {
-  requests: EquipmentRequest[];
+  requests: ExtendedRequest[];
   isAdmin?: boolean;
   onAction?: (id: string, action: "approve" | "reject" | "fulfill") => void;
+  onDelete?: (id: string) => void;
 }
 
 export default function RequestTable({
   requests,
   isAdmin = false,
   onAction,
+  onDelete,
 }: RequestTableProps) {
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(
     null
   );
   const [rejectNote, setRejectNote] = useState("");
   const { toast } = useToast();
+
+  // Group requests by groupId for display
+  const groupedRequests = useMemo(() => {
+    const result: { [key: string]: ExtendedRequest[] } = {};
+    
+    // First, handle requests without groupId
+    const nonGroupedRequests = requests.filter(r => !r.groupId);
+    nonGroupedRequests.forEach(req => {
+      result[req.id] = [req];
+    });
+    
+    // Then handle grouped requests
+    const groupedReqs = requests.filter(r => r.groupId);
+    groupedReqs.forEach(req => {
+      if (!result[req.groupId!]) {
+        result[req.groupId!] = [];
+      }
+      result[req.groupId!].push(req);
+    });
+    
+    return result;
+  }, [requests]);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -100,6 +131,67 @@ export default function RequestTable({
     // Or, better: call your fetch function to update the requests state
   };
 
+  const handleGroupAction = async (
+    groupId: string,
+    action: "approve" | "reject" | "fulfill"
+  ) => {
+    const groupRequests = groupedRequests[groupId] || [];
+    if (groupRequests.length === 0) return;
+    
+    try {
+      const batch = writeBatch(db);
+      const now = Timestamp.now();
+      let update: any = { status: statusMap[action] };
+      
+      if (action === "approve") update.approvedAt = now;
+      if (action === "fulfill") update.fulfilledAt = now;
+      
+      // Update all requests in the group
+      groupRequests.forEach(request => {
+        const requestRef = doc(db, "requests", request.id);
+        batch.update(requestRef, update);
+      });
+      
+      // Commit the batch
+      await batch.commit();
+      
+      // Add notification for the user
+      const sampleRequest = groupRequests[0];
+      if (sampleRequest?.employeeId) {
+        await addDoc(collection(db, "notifications"), {
+          userId: sampleRequest.employeeId,
+          type: `request_group_${statusMap[action]}`,
+          requestGroupId: groupId,
+          message: `notificationMessages.requestGroup${capitalizeFirstLetter(action)}ed`,
+          messageParams: { 
+            count: groupRequests.length 
+          },
+          read: false,
+          createdAt: Timestamp.now(),
+        });
+      }
+      
+      toast({
+        title: t(`requestTable.group${capitalizeFirstLetter(action)}Success`),
+        description: t(`requestTable.group${capitalizeFirstLetter(action)}Description`, { 
+          count: groupRequests.length 
+        }),
+      });
+      
+      // Refresh the page
+      if (typeof window !== "undefined" && window.location) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Error handling group action:", error);
+      toast({
+        title: "Error",
+        description: "There was an error processing the request.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleReject = async (id: string) => {
     setSelectedRequestId(id);
     setRejectDialogOpen(true);
@@ -140,8 +232,23 @@ export default function RequestTable({
     setSelectedRequestId(null);
   };
 
+  const handleDelete = (id: string) => {
+    setSelectedRequestId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedRequestId) return;
+    if (onDelete) {
+      onDelete(selectedRequestId);
+    }
+    setDeleteDialogOpen(false);
+    setSelectedRequestId(null);
+  };
+
   const actionHandler = onAction || handleAction; // fallback to local if not provided
 
+  // Render table with grouped requests
   return (
     <>
       <div className="rounded-md border bg-white overflow-hidden">
@@ -168,12 +275,6 @@ export default function RequestTable({
                 {t("requestTable.requestDate")}
               </TableHead>
               <TableHead className="text-center bg-gray-100 font-bold">
-                {t("requestTable.approveDate")}
-              </TableHead>
-              <TableHead className="text-center bg-gray-100 font-bold">
-                {t("requestTable.fulfilledDate")}
-              </TableHead>
-              <TableHead className="text-center bg-gray-100 font-bold">
                 {t("requestTable.status")}
               </TableHead>
               <TableHead className="text-right bg-gray-100 font-bold">
@@ -182,7 +283,7 @@ export default function RequestTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {requests.length === 0 ? (
+            {Object.keys(groupedRequests).length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={isAdmin ? 7 : 5}
@@ -192,183 +293,328 @@ export default function RequestTable({
                 </TableCell>
               </TableRow>
             ) : (
-              requests.map((request) => (
-                <>
-                  <TableRow key={request.id}>
+              Object.entries(groupedRequests).map(([groupId, groupItems]) => {
+                const isGroup = groupItems.length > 1;
+                const sampleRequest = groupItems[0];
+                const isExpanded = expandedId === groupId;
+
+                const mainRow = (
+                  <TableRow
+                    key={groupId}
+                    className={`${
+                      isGroup ? "bg-blue-50 hover:bg-blue-100" : ""
+                    } ${isExpanded ? "border-b-0" : ""}`}
+                    onClick={() => isGroup && toggleExpand(groupId)}
+                  >
                     <TableCell className="font-medium">
-                      {request.equipmentName}
+                      <div className="flex items-center">
+                        {isGroup && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="mr-2 p-0 h-6 w-6"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleExpand(groupId);
+                            }}
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
+                        {isGroup ? (
+                          <div className="flex items-center">
+                            <Package className="h-4 w-4 mr-2" />
+                            <span>
+                              {t("requestTable.multiItemOrder", {
+                                count: groupItems.length,
+                              })}
+                            </span>
+                          </div>
+                        ) : (
+                          sampleRequest.equipmentName
+                        )}
+                      </div>
                     </TableCell>
-                    {isAdmin && <TableCell>{request.employeeName}</TableCell>}
-                    {isAdmin && <TableCell>{request.department}</TableCell>}
+                    {isAdmin && (
+                      <TableCell>{sampleRequest.employeeName}</TableCell>
+                    )}
+                    {isAdmin && (
+                      <TableCell>{sampleRequest.department}</TableCell>
+                    )}
                     <TableCell className="text-center">
-                      {request.quantity}
+                      {isGroup
+                        ? groupItems.reduce(
+                            (sum, item) => sum + item.quantity,
+                            0
+                          )
+                        : sampleRequest.quantity}
                     </TableCell>
                     <TableCell className="text-center">
-                      {formatDate(request.createdAt)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {request.approvedAt
-                        ? request.approvedAt.toDate
-                          ? request.approvedAt.toDate().toLocaleString()
-                          : new Date(request.approvedAt).toLocaleString()
-                        : "-"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {request.fulfilledAt
-                        ? request.fulfilledAt.toDate
-                          ? request.fulfilledAt.toDate().toLocaleString()
-                          : new Date(request.fulfilledAt).toLocaleString()
-                        : "-"}
+                      {formatDate(sampleRequest.createdAt)}
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge
                         variant="outline"
-                        className={`${getStatusBadgeClass(request.status)}`}
+                        className={`${getStatusBadgeClass(
+                          sampleRequest.status
+                        )}`}
                       >
-                        {t(`requestTable.statuses.${request.status}`)}
+                        {t(`requestTable.statuses.${sampleRequest.status}`)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleExpand(request.id)}
-                        >
-                          {expandedId === request.id
-                            ? t("requestTable.hide")
-                            : t("requestTable.details")}
-                        </Button>
-
-                        {isAdmin && request.status === "pending" && (
+                        {isAdmin && sampleRequest.status === "pending" && (
                           <>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() =>
-                                actionHandler(request.id, "approve")
-                              }
-                              className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                isGroup
+                                  ? handleGroupAction(groupId, "approve")
+                                  : actionHandler(
+                                      sampleRequest.id,
+                                      "approve"
+                                    );
+                              }}
                             >
                               {t("requestTable.approve")}
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleReject(request.id)}
-                              className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleReject(sampleRequest.id);
+                              }}
                             >
                               {t("requestTable.reject")}
                             </Button>
                           </>
                         )}
-
-                        {isAdmin && request.status === "approved" && (
+                        {isAdmin && sampleRequest.status === "approved" && (
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => actionHandler(request.id, "fulfill")}
-                            className="bg-blue-100 text-blue-700 hover:bg-blue-200 ml-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              isGroup
+                                ? handleGroupAction(groupId, "fulfill")
+                                : actionHandler(sampleRequest.id, "fulfill");
+                            }}
                           >
                             {t("requestTable.fulfill")}
                           </Button>
                         )}
-
-                        {!isAdmin && request.status === "pending" && (
+                        {onDelete && (
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            onClick={async () => {
-                              await updateDoc(doc(db, "requests", request.id), {
-                                status: "cancelled",
-                              });
-                              toast({
-                                title: "Request Cancelled",
-                                description: `Request #${request.id} has been cancelled.`,
-                              });
-                              window.location.reload(); // Or trigger a re-fetch of requests
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(sampleRequest.id);
                             }}
-                            className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
                           >
-                            {t("requestTable.cancel")}
+                            {t("requestTable.delete")}
                           </Button>
                         )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(groupId);
+                          }}
+                        >
+                          {isExpanded
+                            ? t("requestTable.less")
+                            : t("requestTable.details")}
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                  {expandedId === request.id && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={isAdmin ? 7 : 5}
-                        className="bg-gray-50 p-4"
-                      >
-                        <div className="space-y-2 text-sm">
-                          {request.notes && (
-                            <div>
-                              <span className="font-medium">
-                                {t("requestTable.requestNotes")}:
-                              </span>{" "}
-                              {request.notes}
-                            </div>
-                          )}
+                );
 
-                          {request.adminNotes && (
-                            <div>
-                              <span className="font-medium">
-                                {t("requestTable.adminNotes")}:
-                              </span>{" "}
-                              {request.adminNotes}
-                            </div>
-                          )}
+                const expandedRow = isExpanded ? (
+                  <TableRow
+                    key={`${groupId}-details`}
+                    className="bg-gray-50"
+                  >
+                    <TableCell colSpan={isAdmin ? 7 : 5} className="p-4">
+                      <div className="space-y-4">
+                        {/* Notes section */}
+                        {sampleRequest.notes && (
+                          <div>
+                            <h4 className="font-semibold mb-1">
+                              {t("requestTable.notes")}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              {sampleRequest.notes}
+                            </p>
+                          </div>
+                        )}
 
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <span className="font-medium">
-                                {t("requestTable.requestDate")}:
-                              </span>{" "}
-                              {formatDate(request.createdAt)}
+                        {/* For grouped requests, show item details */}
+                        {isGroup && (
+                          <div>
+                            <h4 className="font-semibold mb-2">
+                              {t("requestTable.itemsInOrder")}
+                            </h4>
+                            <div className="bg-white rounded border overflow-hidden">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>
+                                      {t("requestTable.item")}
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      {t("requestTable.quantity")}
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      {t("requestTable.status")}
+                                    </TableHead>
+                                    {isAdmin &&
+                                      sampleRequest.status === "pending" && (
+                                        <TableHead className="text-right">
+                                          {t("requestTable.actions")}
+                                        </TableHead>
+                                      )}
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {groupItems.map((item) => (
+                                    <TableRow key={item.id}>
+                                      <TableCell>
+                                        {item.equipmentName}
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                        {item.quantity}
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                        <Badge
+                                          variant="outline"
+                                          className={`${getStatusBadgeClass(
+                                            item.status
+                                          )}`}
+                                        >
+                                          {t(
+                                            `requestTable.statuses.${item.status}`
+                                          )}
+                                        </Badge>
+                                      </TableCell>
+                                      {isAdmin &&
+                                        sampleRequest.status === "pending" && (
+                                          <TableCell className="text-right">
+                                            <div className="flex justify-end space-x-2">
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                  actionHandler(
+                                                    item.id,
+                                                    "approve"
+                                                  )
+                                                }
+                                              >
+                                                {t("requestTable.approve")}
+                                              </Button>
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                  handleReject(item.id)
+                                                }
+                                              >
+                                                {t("requestTable.reject")}
+                                              </Button>
+                                            </div>
+                                          </TableCell>
+                                        )}
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
                             </div>
+                          </div>
+                        )}
 
-                            {request.approvalDate && (
+                        {/* Timeline/history */}
+                        <div>
+                          <h4 className="font-semibold mb-2">
+                            {t("requestTable.timeline")}
+                          </h4>
+                          <div className="space-y-2">
+                            <div className="flex items-start">
+                              <div className="h-2 w-2 rounded-full bg-blue-500 mt-1.5 mr-2"></div>
                               <div>
-                                <span className="font-medium">
-                                  {t("requestTable.approveDate")}:
-                                </span>{" "}
-                                {formatDate(request.approvalDate)}
+                                <p className="text-sm font-medium">
+                                  {t("requestTable.requestCreated")}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {formatDate(sampleRequest.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+
+                            {sampleRequest.approvedAt && (
+                              <div className="flex items-start">
+                                <div className="h-2 w-2 rounded-full bg-green-500 mt-1.5 mr-2"></div>
+                                <div>
+                                  <p className="text-sm font-medium">
+                                    {t("requestTable.requestApproved")}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {formatDate(sampleRequest.approvedAt)}
+                                  </p>
+                                </div>
                               </div>
                             )}
 
-                            {request.fulfillmentDate && (
-                              <div>
-                                <span className="font-medium">
-                                  {t("requestTable.fulfilledDate")}:
-                                </span>{" "}
-                                {formatDate(request.fulfillmentDate)}
+                            {sampleRequest.fulfilledAt && (
+                              <div className="flex items-start">
+                                <div className="h-2 w-2 rounded-full bg-purple-500 mt-1.5 mr-2"></div>
+                                <div>
+                                  <p className="text-sm font-medium">
+                                    {t("requestTable.requestFulfilled")}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {formatDate(sampleRequest.fulfilledAt)}
+                                  </p>
+                                </div>
                               </div>
                             )}
                           </div>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </>
-              ))
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : null;
+
+                return [mainRow, expandedRow];
+              })
             )}
           </TableBody>
         </Table>
       </div>
 
+      {/* Reject dialog */}
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("requestTable.rejectRequest")}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
+            <p className="mb-4">{t("requestTable.rejectReason")}</p>
             <Textarea
-              placeholder={t("requestTable.rejectReasonPlaceholder")}
               value={rejectNote}
               onChange={(e) => setRejectNote(e.target.value)}
-              className="min-h-[100px]"
+              placeholder={t("requestTable.rejectReasonPlaceholder")}
+              className="min-h-32"
             />
           </div>
           <DialogFooter>
@@ -376,10 +622,33 @@ export default function RequestTable({
               variant="outline"
               onClick={() => setRejectDialogOpen(false)}
             >
-              {t("common.cancel")}
+              {t("requestTable.cancel")}
             </Button>
             <Button variant="destructive" onClick={confirmReject}>
-              {t("requestTable.confirmReject")}
+              {t("requestTable.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("requestTable.deleteRequest")}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p>{t("requestTable.deleteConfirmation")}</p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
+              {t("requestTable.cancel")}
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              {t("requestTable.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

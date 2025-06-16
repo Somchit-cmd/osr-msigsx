@@ -10,7 +10,8 @@ import {
   where,
   orderBy,
   Timestamp,
-  getDoc
+  getDoc,
+  writeBatch
 } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { recordItemUsage } from "./usageTrackingService";
@@ -32,6 +33,20 @@ export interface Request {
   approvedBy?: string;
   approvedAt?: Timestamp;
   fulfilledAt?: Timestamp;
+  groupId?: string; // ID to group requests that were submitted together
+}
+
+// Interface for bulk request with multiple items
+export interface BulkRequest {
+  items: {
+    equipmentId: string;
+    equipmentName: string;
+    quantity: number;
+  }[];
+  employeeId: string;
+  employeeName: string;
+  department: string;
+  notes?: string;
 }
 
 // Create a new request
@@ -104,6 +119,62 @@ export function subscribeToUserRequests(
     })) as Request[];
     callback(requests);
   });
+}
+
+// Create a bulk request with multiple items
+export async function createBulkRequest(bulkRequest: BulkRequest) {
+  try {
+    const batch = writeBatch(db);
+    const now = Timestamp.now();
+    
+    // Generate a group ID to link all requests together
+    const groupId = `group_${Date.now()}_${bulkRequest.employeeId}`;
+    
+    // Create a request document for each item
+    for (const item of bulkRequest.items) {
+      const requestData = {
+        employeeId: bulkRequest.employeeId,
+        employeeName: bulkRequest.employeeName,
+        department: bulkRequest.department,
+        equipmentId: item.equipmentId,
+        equipmentName: item.equipmentName,
+        quantity: item.quantity,
+        status: 'pending' as const,
+        priority: 'medium' as const, // Default priority
+        notes: bulkRequest.notes,
+        createdAt: now,
+        updatedAt: now,
+        groupId: groupId // Add the group ID to link related requests
+      };
+      
+      // Add to batch
+      const newRequestRef = doc(collection(db, "requests"));
+      batch.set(newRequestRef, requestData);
+    }
+    
+    // Add a notification for admin
+    const notificationRef = doc(collection(db, "notifications"));
+    batch.set(notificationRef, {
+      userId: "admin",
+      type: "new_bulk_request",
+      requestGroupId: groupId,
+      message: "notificationMessages.newBulkRequest",
+      messageParams: {
+        name: bulkRequest.employeeName,
+        count: bulkRequest.items.length
+      },
+      read: false,
+      createdAt: now
+    });
+    
+    // Commit the batch
+    await batch.commit();
+    
+    return { success: true, groupId };
+  } catch (error) {
+    console.error("Error creating bulk request:", error);
+    throw error;
+  }
 }
 
 // Subscribe to all requests (for admin)

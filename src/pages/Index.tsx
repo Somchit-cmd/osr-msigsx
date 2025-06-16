@@ -4,21 +4,25 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EquipmentCard from "@/components/EquipmentCard";
 import CategoryFilter from "@/components/CategoryFilter";
-import RequestForm from "@/components/RequestForm";
+import ItemDetailDialog from "@/components/ItemDetailDialog";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { useTranslation } from "react-i18next";
+import RequestNewItemDialog from "@/components/RequestNewItemDialog";
+import RequestForm from "@/components/RequestForm";
 
 const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All Items");
-  const [selectedEquipment, setSelectedEquipment] =
-    useState<InventoryItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [isItemDetailOpen, setIsItemDetailOpen] = useState(false);
+  const [isNewItemDialogOpen, setIsNewItemDialogOpen] = useState(false);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [equipments, setEquipments] = useState<InventoryItem[]>([]);
@@ -76,20 +80,29 @@ const Index = () => {
     return matchesCategory && matchesSearch;
   });
 
-  const handleReserve = (equipmentId: string) => {
+  const handleViewItem = (equipmentId: string) => {
     const equipment = equipments.find((item) => item.id === equipmentId);
     if (equipment) {
-      setSelectedEquipment(equipment);
+      setSelectedItem(equipment);
+      setIsItemDetailOpen(true);
+    }
+  };
+
+  const handleRequestNow = (equipmentId: string) => {
+    const equipment = equipments.find((item) => item.id === equipmentId);
+    if (equipment) {
+      setSelectedItem(equipment);
       setIsRequestFormOpen(true);
     }
   };
 
   const handleRequestSubmit = (formData: any) => {
-    // In a real app, we would send this to an API
-    // For now, just show a success message
     toast({
-      title: "Request submitted successfully",
-      description: `Your request for ${formData.quantity} ${formData.equipmentName}(s) is being processed.`,
+      title: t("requestForm.successTitle"),
+      description: t("requestForm.successDescription", { 
+        quantity: formData.quantity, 
+        name: formData.equipmentName 
+      }),
     });
   };
 
@@ -109,15 +122,19 @@ const Index = () => {
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
           />
-
-          <div className="relative w-full max-w-xs md:w-64 self-start">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t("homepage.searchPlaceholder")}
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setIsNewItemDialogOpen(true)}>
+              {t("homepage.requestNewItem")}
+            </Button>
+            <div className="relative w-full max-w-xs md:w-64 self-start">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t("homepage.searchPlaceholder")}
+                className="pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -131,18 +148,31 @@ const Index = () => {
               <EquipmentCard
                 key={item.id}
                 equipment={item}
-                onReserve={handleReserve}
+                onView={handleViewItem}
+                onRequestNow={handleRequestNow}
               />
             ))}
           </div>
         )}
       </main>
 
+      <ItemDetailDialog
+        isOpen={isItemDetailOpen}
+        onClose={() => setIsItemDetailOpen(false)}
+        item={selectedItem}
+      />
+
       <RequestForm
         isOpen={isRequestFormOpen}
         onClose={() => setIsRequestFormOpen(false)}
-        equipment={selectedEquipment}
+        equipment={selectedItem}
         onSubmit={handleRequestSubmit}
+      />
+
+      <RequestNewItemDialog
+        isOpen={isNewItemDialogOpen}
+        onClose={() => setIsNewItemDialogOpen(false)}
+        user={user}
       />
 
       <Footer />

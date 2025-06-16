@@ -6,6 +6,7 @@
     "myRequests": "ຄຳຂໍຂອງຂ້ອຍ",
     "dashboard": "ໜ້າຄວບຄຸມ",
     "requests": "ຄຳຮ້ອງຂໍ",
+    "newItemRequests": "ຄຳຮ້ອງຂໍເພີ່ມອຸປະກອນໃໝ່",
     "inventory": "ອຸປະກອນ",
     "reports": "ລາຍງານ",
     "settings": "ຕັ້ງຄ່າ",
@@ -84,11 +85,15 @@
     "subtitle": "ຊອກຫາ ແລະ ຂໍເບີກອຸປະກອນຕາມຄວາມຕ້ອງການຂອງທ່ານ",
     "searchPlaceholder": "ຊອກຫາອຸປະກອນ...",
     "noResults": "ບໍ່ພົບອຸປະກອນທີ່ກົງກັບເງື່ອນໄຂຂອງທ່ານ.",
-    "requestNow": "ຂໍເບີກສີ່ງນີ້"
+    "requestNow": "ຂໍເບີກສີ່ງນີ້",
+    "requestNewItem": "ຂໍເພີ່ມອຸປະກອນໃໝ່"
   },
   "equipment": {
     "available": "ຍັງເຫຼືອ {{count}}",
-    "outOfStock": "ໝົດສະຕັອກ"
+    "outOfStock": "ໝົດສະຕັອກ",
+    "view": "ລາຍລະອຽດ",
+    "addToCart": "ເພີ່ມເຂົ້າໃນກະຕ່າ",
+    "requestNow": "ຂໍເບີກສີ່ງນີ້"
   },
   "categories": {
     "allItems": "ທຸກລາຍການ",
@@ -145,6 +150,7 @@
     "reject": "ປະຕິເສດ",
     "fulfill": "ສົ່ງມອບສຳເລັດ",
     "cancel": "ຍົກເລີກ",
+    "delete": "ລົບ",
     "requestNotes": "ໝາຍເຫດຄຳຂໍ",
     "adminNotes": "ໝາຍເຫດຈາກແອັດມິນ",
     "rejectRequest": "ປະຕິເສດຄຳຂໍ",
@@ -156,7 +162,42 @@
       "rejected": "ປະຕິເສດ",
       "fulfilled": "ສົ່ງມອບແລ້ວ",
       "cancelled": "ຍົກເລີກ"
-    }
+    },
+    "approveSuccess": "ຄຳຂໍອະນຸມັດແລ້ວ",
+    "rejectDescription": "ຄຳຂໍອຸປະກອນ #{{id}} ຖືກປະຕິເສດສຳເລັດ",
+    "fulfillSuccess": "ຄຳຂໍສົ່ງມອບແລ້ວ",
+    "fulfillDescription": "ຄຳຂໍອຸປະກອນ #{{id}} ສົ່ງມອບແລ້ວສຳເລັດ",
+    "deleteSuccess": "ຄຳຂໍລົບລົບແລ້ວ",
+    "deleteDescription": "ຄຳຂໍອຸປະກອນ #{{id}} ຖືກລົບແລ້ວ",
+    "rejectDialog": {
+      "title": "ປະຕິເສດຄຳຂໍ",
+      "placeholder": "ປ້ອນເຫດຜົນສຳລັບການປະຕິເສດ (ເລືອກໄດ້)",
+      "cancel": "ຍົກເລີກ",
+      "confirm": "ຢືນຢັນການປະຕິເສດ"
+    },
+    "deleteDialog": {
+      "title": "ລົບຄຳຂໍ",
+      "message": "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລົບຄຳຂໍນີ້?",
+      "cancel": "ຍົກເລີກ",
+      "confirm": "ຢືນຢັນການລົບ"
+    },
+    "less": "ເຊື່ອງ",
+    "notes": "ໝາຍເຫດ",
+    "item": "ລາຍການ",
+    "itemsInOrder": "ລາຍການໃນຄຳຂໍນີ້",
+    "timeline": "ລາຍລະອຽດເວລາ",
+    "requestCreated": "ຄຳຂໍສ້າງແລ້ວ",
+    "requestApproved": "ຄຳຂໍອະນຸມັດແລ້ວ",
+    "requestFulfilled": "ຄຳຂໍສົ່ງມອບແລ້ວ",
+    "multiItemOrder": "ລາຍການຄຳຂໍແບບຫຼາຍອັນ ({{count}})",
+    "rejectReason": "ກະລຸນາປ້ອນເຫດຜົນສຳລັບການປະຕິເສດຄຳຂໍນີ້",
+    "deleteRequest": "ລົບຄຳຂໍ",
+    "deleteConfirmation": "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລົບຄຳຂໍນີ້? ການດຳເນີນການນີ້ບໍ່ສາມາດຍ້ອນກັບໄດ້.",
+    "confirm": "ຢືນຢັນ",
+    "groupApproveSuccess": "ຄຳຂໍອະນຸມັດແບບຫຼາຍອັນ",
+    "groupApproveDescription": "{{count}} ລາຍການໄດ້ຮັບອະນຸມັດແລ້ວ.",
+    "groupFulfillSuccess": "ຄຳຂໍສົ່ງມອບແບບຫຼາຍອັນ",
+    "groupFulfillDescription": "{{count}} ລາຍການໄດ້ສົ່ງມອບແລ້ວ."
   },
   "logout": {
     "title": "ຢືນຢັນການອອກຈາກລະບົບ",
@@ -337,7 +378,11 @@
     "newRequest": "ຄຳຂໍໃໝ່ #{{id}} ຖືກສົ່ງໂດຍ {{name}}.",
     "requestApproved": "ຄຳຂໍ #{{id}} ຂອງທ່ານໄດ້ຮັບການອະນຸມັດແລ້ວ.",
     "requestRejected": "ຄຳຂໍ #{{id}} ຂອງທ່ານຖືກປະຕິເສດ.",
-    "requestFulfilled": "ຄຳຂໍ #{{id}} ຂອງທ່ານໄດ້ຮັບການສົ່ງມອບແລ້ວ."
+    "requestFulfilled": "ຄຳຂໍ #{{id}} ຂອງທ່ານໄດ້ຮັບການສົ່ງມອບແລ້ວ.",
+    "newItemRequestSubmitted": "ຄຳຮ້ອງຂໍເພີ່ມອຸປະກອນໃໝ່ຖືກສົ່ງໂດຍ {{userName}}.",
+    "itemRequestApproved": "ຄຳຂໍເພີ່ມອຸປະກອນອຸປະກອນໃໝ່ #{{itemName}} ຖືກອະນຸມັດແລ້ວ.",
+    "itemRequestRejected": "ຄຳຂໍເພີ່ມອຸປະກອນໃໝ່ #{{itemName}} ຖືກປະຕິເສດ.",
+    "newBulkRequest": "ຄຳຂໍເບິກອຸປະກອນໃໝ່ແບບຫຼາຍອັນ ({{count}}) ຖືກສົ່ງໂດຍ {{name}}."
   },
   "limitations": {
     "title": "ການກຳນົດຈຳນວນຈຳກັດຄຳຂໍອຸປະກອນ",
@@ -351,5 +396,71 @@
     "addLimit": "ເພີ່ມການກຳນົດຈຳນວນຈຳກັດ",
     "monthlyLimitExceeded": "ເກີນຂີດຈຳກັດປະຈຳເດືອນ",
     "limitMessage": "ທ່ານສາມາດຂໍໄດ້ພຽງ {{limit}} {{itemName}} ຕໍ່ເດືອນ. ທ່ານໄດ້ໃຊ້ {{used}} ແລະ ຍັງເຫຼືອ {{remaining}}."
+  },
+  "requestNewItemDialog": {
+    "title": "ຂໍເພີ່ມອຸປະກອນໃໝ່",
+    "description": "ບໍ່ພົບອຸປະກອນທີ່ທ່ານຕ້ອງການ? ຂໍເພີ່ມອຸປະກອນໃໝ່ເພື່ອເພີ່ມເຂົ້າໃນລະບົບ.",
+    "itemName": "ຊື່ອຸປະກອນ",
+    "itemNamePlaceholder": "ຕົວຢ່າງ: ມີດຕັດ",
+    "reason": "ເຫດຜົນ",
+    "reasonPlaceholder": "ກະລຸນາລະບຸເຫດຜົນ ຫຼື ຈຸດປະສົງທີ່ທ່ານຕ້ອງການອຸປະກອນນີ້...",
+    "submit": "ສົ່ງຄຳຮ້ອງຂໍ",
+    "submitting": "ກຳລັງສົ່ງ..."
+  },
+  "newItemRequests": {
+    "title": "ຄຳຮ້ອງຂໍເພີ່ມອຸປະກອນໃໝ່",
+    "description": "ດູແລ ແລະ ຈັດການຄຳຮ້ອງຂໍເພີ່ມອຸປະກອນໃໝ່ຈາກພະນັກງານ.",
+    "tabs": {
+      "pending": "ລໍຖ້າ",
+      "approved": "ອະນຸມັດແລ້ວ",
+      "rejected": "ປະຕິເສດ"
+    },
+    "table": {
+      "itemName": "ຊື່ອຸປະກອນ",
+      "employee": "ພະນັກງານ",
+      "requestDate": "ວັນທີຂໍ",
+      "reason": "ເຫດຜົນ",
+      "actions": "ໝາຍເຫດ",
+      "noRequests": "ບໍ່ມີຄຳຮ້ອງຂໍເພີ່ມອຸປະກອນ"
+    },
+    "actions": {
+      "approve": "ອະນຸມັດ",
+      "reject": "ປະຕິເສດ"
+    }
+  },
+  "cart": {
+    "button": "ກະຕ່າຂໍເບີກເຄື່ອງ",
+    "title": "ກະຕ່າຂອງທ່ານ",
+    "empty": "ກະຕ່າຂອງທ່ານແມ່ນວ່າງ",
+    "continueShopping": "ຂໍເບີກຕໍ່",
+    "checkout": "ຢືນຢັນລາຍການ",
+    "clear": "ລ້າງກະຕ່າ",
+    "totalItems": "ລາຍການທັງໝົດ:",
+    "available": "ຍັງເຫຼືອ {{count}} ອັນ"
+  },
+  "itemDetail": {
+    "description": "ຄຳອະທິບາຍ",
+    "availability": "ຈຳນວນຄົງເຫຼືອ",
+    "availableUnits": "ຍັງເຫຼືອ {{count}} ອັນ",
+    "quantity": "ຈຳນວນ",
+    "cancel": "ຢົກເລີກ",
+    "addToCart": "ເພີ່ມເຂົ້າໃນກະຕ່າ"
+  },
+  "checkout": {
+    "title": "ຢືນຢັນລາຍການຂໍເບີກເຄື່ອງ",
+    "description": "ກວດສອບ ແລະ ຈັດການລາຍການຂໍເບີກເຄື່ອງຂອງທ່ານ",
+    "itemsReview": "ລາຍການຂໍເບີກເຄື່ອງ",
+    "notesLabel": "ໝາຍເຫດພິເສດ",
+    "notesPlaceholder": "ເພີ່ມໝາຍເຫດພິເສດ ຫຼື ລາຍລະອຽດຂອງລາຍການຂໍເບີກເຄື່ອງຂອງທ່ານ...",
+    "summary": "ສະຫຼຸບລາຍການ",
+    "totalItems": "ລາຍການທັງໝົດ",
+    "differentItems": "ລາຍການຕ່າງກັນ",
+    "submitRequest": "ສົ່ງຄຳຮ້ອງຂໍ",
+    "continueShopping": "ຂໍເບີກຕໍ່",
+    "processing": "ກຳລັງດຳເນີນການ...",
+    "successTitle": "ຄຳຮ້ອງຂໍໄດ້ຮັບແລ້ວ",
+    "successMessage": "ຄຳຮ້ອງຂໍຂອງທ່ານໄດ້ຮັບແລ້ວ.",
+    "errorTitle": "ສົ່ງຄຳຮ້ອງຂໍບໍ່ສຳເລັດ",
+    "errorMessage": "ມີບັນຫາການສົ່ງຄຳຮ້ອງຂໍ. ກະລຸນາລອງໃຫມ່."
   }
 }

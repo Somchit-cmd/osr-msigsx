@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
 import { FilterParams } from "@/types";
 import { subscribeToDepartments } from "@/lib/departmentService";
-import { doc, updateDoc, Timestamp, getDoc, addDoc, collection } from "firebase/firestore";
+import { doc, updateDoc, Timestamp, getDoc, addDoc, collection, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Pagination from "@/components/Pagination";
 
@@ -129,6 +129,25 @@ const AdminRequests = () => {
     });
   };
   
+  const handleDelete = async (id: string) => {
+    try {
+      // Maybe add a check here if the item is part of an inventory, to return it.
+      // For now, just delete the request.
+      await deleteDoc(doc(db, "requests", id));
+      toast({
+        title: t("requestTable.deleteSuccess"),
+        description: t("requestTable.deleteDescription", { id }),
+      });
+    } catch (error) {
+      console.error("Error deleting request:", error);
+      toast({
+        title: "Error",
+        description: "There was an error deleting the request.",
+        variant: "destructive",
+      });
+    }
+  };
+  
   const handleFilterChange = (key: keyof FilterParams, value: string) => {
     setFilters(prev => ({
       ...prev,
@@ -206,6 +225,7 @@ const AdminRequests = () => {
               requests={paginatedRequests} 
               isAdmin={true}
               onAction={handleAction}
+              onDelete={handleDelete}
             />
             <Pagination
               currentPage={currentPage}

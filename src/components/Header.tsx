@@ -16,6 +16,7 @@ import logo from "@/assets/logo-small.webp";
 import LogoutConfirmDialog from "@/components/LogoutConfirmDialog";
 import { useState } from "react";
 import NotificationBell from "@/components/NotificationBell";
+import CartButton from "@/components/CartButton";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +28,7 @@ interface HeaderProps {
 export default function Header({ userRole = "employee", user }: HeaderProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const isAdmin = userRole === "admin" || userRole === "supervisor";
+  const isAdmin = userRole === "admin" || userRole === "supervisor" || (user && user.role === "admin");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -80,7 +81,8 @@ export default function Header({ userRole = "employee", user }: HeaderProps) {
                   </span>
                 </div>
               )}
-              <NotificationBell userId={user.id} />
+              <CartButton />
+              <NotificationBell userId={user?.id} />
               <Button
                 variant="outline"
                 size="sm"
@@ -114,6 +116,17 @@ export default function Header({ userRole = "employee", user }: HeaderProps) {
               >
                 <Inbox className="w-4 h-4 mr-1" />
                 {t('header.requests')}
+              </Link>
+              <Link
+                to="/admin/new-item-requests"
+                className={`text-white hover:text-opacity-80 px-3 py-1 rounded flex items-center ${
+                  location.pathname === "/admin/new-item-requests"
+                    ? "font-medium bg-brand-blue/80"
+                    : ""
+                }`}
+              >
+                <Inbox className="w-4 h-4 mr-1" />
+                {t('header.newItemRequests')}
               </Link>
               <Link
                 to="/admin/inventory"
