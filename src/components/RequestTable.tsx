@@ -15,7 +15,7 @@ import {
   getStatusBadgeClass,
   capitalizeFirstLetter,
 } from "@/utils/helpers";
-import { doc, updateDoc, Timestamp, writeBatch } from "firebase/firestore";
+import { doc, updateDoc, Timestamp, writeBatch, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -146,11 +146,32 @@ export default function RequestTable({
       if (action === "approve") update.approvedAt = now;
       if (action === "fulfill") update.fulfilledAt = now;
       
-      // Update all requests in the group
-      groupRequests.forEach(request => {
-        const requestRef = doc(db, "requests", request.id);
-        batch.update(requestRef, update);
-      });
+      // If fulfilling, first fetch all inventory data needed
+      if (action === "fulfill") {
+        // Process each request to update inventory
+        for (const request of groupRequests) {
+          if (request.equipmentId && request.quantity) {
+            const equipmentRef = doc(db, "inventory", request.equipmentId);
+            const equipmentSnap = await getDoc(equipmentRef);
+            
+            if (equipmentSnap.exists()) {
+              const equipmentData = equipmentSnap.data();
+              const newAvailable = Math.max(0, (equipmentData.available || 0) - request.quantity);
+              batch.update(equipmentRef, { available: newAvailable });
+            }
+          }
+          
+          // Also update the request status
+          const requestRef = doc(db, "requests", request.id);
+          batch.update(requestRef, update);
+        }
+      } else {
+        // For non-fulfill actions, just update request statuses
+        groupRequests.forEach(request => {
+          const requestRef = doc(db, "requests", request.id);
+          batch.update(requestRef, update);
+        });
+      }
       
       // Commit the batch
       await batch.commit();
