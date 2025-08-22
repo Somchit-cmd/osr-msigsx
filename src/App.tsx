@@ -42,7 +42,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <CartProvider>
-            <BrowserRouter>
+            <BrowserRouter basename="/osr-msigsx">
               <Routes>
                 <Route path="/login" element={<Login />} />
                 
