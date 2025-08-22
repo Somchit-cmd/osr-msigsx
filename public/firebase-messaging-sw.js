@@ -1,8 +1,10 @@
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
 
+// Note: Service workers can't use import.meta.env, so we'll need to inject these values during build
+// For now, using placeholder values - you'll need to replace these with your new API key
 firebase.initializeApp({
-  apiKey: "AIzaSyBGF4li4IF_HmXGWZKPPJp2aKSS79iNZxw",
+  apiKey: "YOUR_NEW_API_KEY_HERE",
   authDomain: "msigsx-osr-project.firebaseapp.com",
   projectId: "msigsx-osr-project",
   storageBucket: "msigsx-osr-project.appspot.com",
