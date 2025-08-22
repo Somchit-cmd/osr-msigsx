@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
-  base: "/osr-msigsx",
+  base: "/osr-msigsx/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
