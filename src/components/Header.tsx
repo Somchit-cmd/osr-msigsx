@@ -34,7 +34,8 @@ export default function Header({ userRole = "employee", user }: HeaderProps) {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    sessionStorage.removeItem("user"); // Also clear session storage
+    navigate("/login"); // Use navigate instead of window.location.href
   };
 
   return (
